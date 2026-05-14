@@ -5,20 +5,16 @@ using System;
 using System.Drawing;
 
 #if UWP
-using Windows.UI;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Markup;
-using Windows.UI.Xaml.Media;
 using Windows.Win32.UI.WindowsAndMessaging;
 using Windows.Win32.Foundation;
 
 #elif WASDK
-using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
-using Microsoft.UI.Xaml.Media;
 #endif
 
 namespace U5BFA.Libraries
@@ -33,7 +29,6 @@ namespace U5BFA.Libraries
 		private MenuFlyout? _menuFlyout;
 		private bool _disposed;
 
-		private Grid? RootGrid;
 		private Border? MenuFlyoutTargetControl;
 
 		public bool IsOpen { get; private set; }
@@ -51,12 +46,10 @@ namespace U5BFA.Libraries
 		{
 			base.OnApplyTemplate();
 
-			RootGrid = GetTemplateChild(PART_RootGrid) as Grid
-				?? throw new MissingFieldException($"Could not find {PART_RootGrid} in the given {nameof(TrayIconFlyout)}'s style.");
+			if (GetTemplateChild(PART_RootGrid) is not Grid)
+				throw new MissingFieldException($"Could not find {PART_RootGrid} in the given {nameof(TrayIconMenuFlyout)}'s style.");
 			MenuFlyoutTargetControl = GetTemplateChild(PART_MenuFlyoutTargetControl) as Border
-				?? throw new MissingFieldException($"Could not find {PART_MenuFlyoutTargetControl} in the given {nameof(TrayIconFlyout)}'s style.");
-
-			RootGrid.Background = new SolidColorBrush(Colors.Red);
+				?? throw new MissingFieldException($"Could not find {PART_MenuFlyoutTargetControl} in the given {nameof(TrayIconMenuFlyout)}'s style.");
 		}
 
 		protected override void OnItemsChanged(object e)
