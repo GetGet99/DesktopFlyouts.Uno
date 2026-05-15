@@ -137,7 +137,7 @@ namespace U5BFA.Libraries
 
 		private static void SetWindowRectRegion(HWND hWnd, RectInt32 rect)
 		{
-			HRGN region = PInvoke.CreateRectRgn(rect.X, rect.Y, rect.Width, rect.Height);
+			HRGN region = PInvoke.CreateRectRgn(rect.X, rect.Y, rect.X + rect.Width, rect.Y + rect.Height);
 			if (region.IsNull)
 				return;
 
