@@ -1,4 +1,4 @@
-﻿// Copyright (c) 0x5BFA. All rights reserved.
+// Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
 using System;
@@ -47,6 +47,7 @@ namespace U5BFA.Libraries
 		private Point? _customPlacementBottomCenterPoint;
 		private TrayIconFlyoutPopupDirection? _customPopupDirection;
 		private TrayIconFlyoutPopupDirection _activePopupDirection = TrayIconFlyoutPopupDirection.BottomToTop;
+		private bool _disposed;
 
 		private Grid? RootGrid;
 		private Grid? IslandsGrid;
@@ -85,7 +86,7 @@ namespace U5BFA.Libraries
 
 		public void Show()
 		{
-			if (_host?.DesktopWindowXamlSource is null || RootGrid is null || _isPopupAnimationPlaying)
+			if (_disposed || _host?.DesktopWindowXamlSource is null || RootGrid is null || _isPopupAnimationPlaying)
 			{
 				_customPlacementBottomCenterPoint = null;
 				_customPopupDirection = null;
@@ -146,7 +147,7 @@ namespace U5BFA.Libraries
 
 		public void Hide()
 		{
-			if (RootGrid is null || _isPopupAnimationPlaying)
+			if (_disposed || RootGrid is null || _isPopupAnimationPlaying)
 				return;
 
 			_isPopupAnimationPlaying = true;
@@ -468,11 +469,20 @@ namespace U5BFA.Libraries
 
 		public void Dispose()
 		{
+			if (_disposed)
+				return;
+
+			_disposed = true;
+
 #if WASDK
 			BackdropManager?.Dispose();
+			BackdropManager = null;
 #endif
 			_host?.WindowInactivated -= HostWindow_Inactivated;
 			_host?.Dispose();
+			IsOpen = false;
+
+			GC.SuppressFinalize(this);
 		}
 	}
 }

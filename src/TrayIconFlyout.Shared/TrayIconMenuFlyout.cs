@@ -1,4 +1,4 @@
-﻿// Copyright (c) 0x5BFA. All rights reserved.
+// Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
 using System;
@@ -127,12 +127,13 @@ namespace U5BFA.Libraries
 			if (_menuFlyout is not null)
 			{
 				_menuFlyout.Closed -= MenuFlyout_Closed;
-				_menuFlyout.Hide();
+				if (IsOpen)
+					_menuFlyout.Hide();
+
 				_menuFlyout.Items.Clear();
 				_menuFlyout = null;
 			}
 
-			_host?.UpdateWindowVisibility(false);
 			_host?.Dispose();
 			IsOpen = false;
 
