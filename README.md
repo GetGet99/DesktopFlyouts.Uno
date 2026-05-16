@@ -1,11 +1,15 @@
 <h1 align="center">Tray Icon Flyout</h1>
 <p align="center">Empower your app with a flyout for its tray icon in WinUI 2/3.</p>
 
+https://github.com/user-attachments/assets/52f15ecf-6a91-491b-bf62-25294afc85d7
+
 ## Installing the package
 
 You can consume this project via NuGet. Use NuGet Package Manager or run the following command in the Package Manager Console:
 
-### UWP/WinUI 2
+### WinUI for UWP (UWP/WinUI2)
+
+The UWP version of sample app is currently under development. Recommend to use WinUI 3
 
 <a style="text-decoration:none" href="https://www.nuget.org/packages/0x5BFA.TrayIconFlyout.Uwp"><img src="https://img.shields.io/nuget/v/0x5BFA.TrayIconFlyout.Uwp" alt="NuGet badge" /></a>
 
@@ -13,7 +17,7 @@ You can consume this project via NuGet. Use NuGet Package Manager or run the fol
 > dotnet add package 0x5BFA.TrayIconFlyout.Uwp --prerelease
 ```
 
-### WindowsAppSDK/WinUI 3
+### WinUI (WinAppSDK/WinUI3)
 
 <a style="text-decoration:none" href="https://www.nuget.org/packages/0x5BFA.TrayIconFlyout.WinUI"><img src="https://img.shields.io/nuget/v/0x5BFA.TrayIconFlyout.WinUI" alt="NuGet badge" /></a>
 
