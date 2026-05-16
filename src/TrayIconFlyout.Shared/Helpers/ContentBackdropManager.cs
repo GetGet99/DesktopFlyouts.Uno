@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices.Marshalling;
 
 #if WASDK
 using Microsoft.UI.Composition;
@@ -21,6 +20,7 @@ namespace U5BFA.Libraries
 		private SystemBackdropConfiguration? _configuration;
 		private Compositor? _compositor;
 		private readonly List<ContentExternalBackdropLink> _linkCollection = [];
+		private bool _disposed;
 
 		internal static ContentBackdropManager? Create(ISystemBackdropControllerWithTargets backdropController, Compositor compositor, ElementTheme elementTheme)
 		{
@@ -39,30 +39,40 @@ namespace U5BFA.Libraries
 
 		internal ContentExternalBackdropLink? CreateLink()
 		{
-			if (_backdropController is null || _compositor is null)
+			if (_disposed || _backdropController is null || _compositor is null)
 				return null;
 
 			var backdropLink = ContentExternalBackdropLink.Create(_compositor);
 			backdropLink.ExternalBackdropBorderMode = CompositionBorderMode.Soft;
-			_linkCollection.Add(backdropLink);
 			_backdropController.AddSystemBackdropTarget(backdropLink);
+			_linkCollection.Add(backdropLink);
 			return backdropLink;
 		}
 
 		internal void RemoveLink(ContentExternalBackdropLink backdropLink)
 		{
-			if (!_linkCollection.Contains(backdropLink))
+			if (!_linkCollection.Remove(backdropLink))
 				return;
 
+			DetachAndDisposeLink(backdropLink);
+		}
+
+		private void DetachAndDisposeLink(ContentExternalBackdropLink backdropLink)
+		{
 			try
 			{
 				_backdropController?.RemoveSystemBackdropTarget(backdropLink);
-				_linkCollection.Remove(backdropLink);
+			}
+			catch
+			{
+			}
+
+			try
+			{
 				backdropLink.Dispose();
 			}
-			catch (Exception e)
+			catch
 			{
-				ExceptionAsVoidMarshaller.ConvertToUnmanaged(e);
 			}
 		}
 
@@ -76,19 +86,30 @@ namespace U5BFA.Libraries
 
 		public void Dispose()
 		{
+			if (_disposed)
+				return;
+
+			_disposed = true;
+
+			// Detach only the links we own. RemoveAllSystemBackdropTargets can throw
+			// during app shutdown after WinAppSDK has already torn down some targets.
+			foreach (ContentExternalBackdropLink contentExternalBackdropLink in _linkCollection.ToArray())
+			{
+				_linkCollection.Remove(contentExternalBackdropLink);
+				DetachAndDisposeLink(contentExternalBackdropLink);
+			}
+
 			try
 			{
-				_compositor = null;
-				_configuration = null;
-				_backdropController?.RemoveAllSystemBackdropTargets();
 				_backdropController?.Dispose();
-
-				foreach (ContentExternalBackdropLink contentExternalBackdropLink in _linkCollection)
-					contentExternalBackdropLink.Dispose();
-
-				_linkCollection.Clear();
 			}
-			catch { }
+			catch
+			{
+			}
+
+			_backdropController = null;
+			_configuration = null;
+			_compositor = null;
 		}
 	}
 #endif
