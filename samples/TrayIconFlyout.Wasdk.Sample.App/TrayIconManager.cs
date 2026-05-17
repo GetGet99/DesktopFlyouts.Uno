@@ -13,7 +13,7 @@ namespace U5BFA.Libraries
 		internal SystemTrayIcon? SystemTrayIcon { get; set; }
 		internal TrayIconFlyout? TrayIconFlyout { get; set; }
 		internal TrayIconMenuFlyout? TrayIconMenuFlyout { get; set; }
-		internal TrayIconFlyoutExample SelectedFlyoutExample { get; private set; }
+		internal FlyoutSampleKinds SelectedFlyoutExample { get; private set; }
 
 		private bool _disposed;
 
@@ -30,7 +30,7 @@ namespace U5BFA.Libraries
 			SystemTrayIcon.RightClicked += SystemTrayIcon_RightClicked;
 		}
 
-		internal void SwitchFlyout(TrayIconFlyoutExample example)
+		internal void SwitchFlyout(FlyoutSampleKinds example)
 		{
 			if (_disposed || (TrayIconFlyout is not null && SelectedFlyoutExample == example))
 				return;
@@ -43,13 +43,14 @@ namespace U5BFA.Libraries
 			oldFlyout?.Dispose();
 		}
 
-		private static TrayIconFlyout CreateFlyout(TrayIconFlyoutExample example)
+		private static TrayIconFlyout CreateFlyout(FlyoutSampleKinds example)
 		{
 			return example switch
 			{
-				TrayIconFlyoutExample.StickySmall => new StickySmallTrayIconFlyout(),
-				TrayIconFlyoutExample.StartMenuStyle => new StartMenuStyleTrayIconFlyout(),
-				TrayIconFlyoutExample.WidgetStyle => new WidgetStyleTrayIconFlyout(),
+				FlyoutSampleKinds.StickySmallStyle => new StickySmallTrayIconFlyout(),
+				FlyoutSampleKinds.StartMenuStyle => new StartMenuStyleTrayIconFlyout(),
+				FlyoutSampleKinds.WidgetStyle => new WidgetStyleTrayIconFlyout(),
+				FlyoutSampleKinds.IndicatorStyle => new IndicatorStyleFlyout(),
 				_ => new MainTrayIconFlyout(),
 			};
 		}

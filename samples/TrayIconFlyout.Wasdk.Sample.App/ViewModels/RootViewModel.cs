@@ -46,7 +46,7 @@ namespace U5BFA.Libraries
 
         public Dictionary<TrayIconFlyoutPopupDirection, string> PopupDirections { get; private set; } = [];
         public Dictionary<FlyoutPlacementMode, string> FlyoutPlacements { get; private set; } = [];
-        public Dictionary<TrayIconFlyoutExample, string> FlyoutExamples { get; private set; } = [];
+        public Dictionary<FlyoutSampleKinds, string> FlyoutExamples { get; private set; } = [];
         public Dictionary<BackdropKind, string> Backdrops { get; private set; } = [];
 
         internal RootViewModel()
@@ -57,10 +57,11 @@ namespace U5BFA.Libraries
             IsBackdropEnabled = true;
             HideOnLostFocus = true;
 
-            FlyoutExamples.Add(TrayIconFlyoutExample.Default, "Default");
-            FlyoutExamples.Add(TrayIconFlyoutExample.StickySmall, "Sticky small");
-            FlyoutExamples.Add(TrayIconFlyoutExample.StartMenuStyle, "Start menu");
-            FlyoutExamples.Add(TrayIconFlyoutExample.WidgetStyle, "Widget");
+            FlyoutExamples.Add(FlyoutSampleKinds.DefaultStyle, "Default");
+            FlyoutExamples.Add(FlyoutSampleKinds.StickySmallStyle, "Sticky small");
+            FlyoutExamples.Add(FlyoutSampleKinds.StartMenuStyle, "Start menu");
+            FlyoutExamples.Add(FlyoutSampleKinds.WidgetStyle, "Widget");
+            FlyoutExamples.Add(FlyoutSampleKinds.IndicatorStyle, "Indicator");
             SelectedFlyoutExampleIndex = 0;
 
             PopupDirections.Add(TrayIconFlyoutPopupDirection.Vertical, "Vertical");
@@ -123,7 +124,7 @@ namespace U5BFA.Libraries
             var flyoutKind = FlyoutExamples.ElementAt(value).Key;
 
             TrayIconManager.Default.SwitchFlyout(flyoutKind);
-            if (flyoutKind is TrayIconFlyoutExample.Default)
+            if (flyoutKind is FlyoutSampleKinds.DefaultStyle)
             {
                 IsModifiable = true;
                 ApplyDefaultFlyoutSettings();

@@ -1,0 +1,17 @@
+<local:TrayIconFlyout
+    x:Class="U5BFA.Libraries.IndicatorStyleFlyout"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:animatedvisuals="using:Microsoft.UI.Xaml.Controls.AnimatedVisuals"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:U5BFA.Libraries"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    IslandsOrientation="Horizontal"
+    Placement="Bottom"
+    mc:Ignorable="d">
+
+    <local:TrayIconFlyoutIsland>
+        <TextBlock Margin="32,16" Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit..." />
+    </local:TrayIconFlyoutIsland>
+
+</local:TrayIconFlyout>
