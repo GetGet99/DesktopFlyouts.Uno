@@ -2,111 +2,117 @@
 // Licensed under the MIT license.
 
 using System;
+using System.Drawing;
 
 namespace U5BFA.Libraries
 {
-	internal partial class TrayIconManager : IDisposable
-	{
-		private static readonly Lazy<TrayIconManager> _default = new(() => new TrayIconManager());
-		internal static TrayIconManager Default => _default.Value;
+    internal partial class TrayIconManager : IDisposable
+    {
+        private static readonly Lazy<TrayIconManager> _default = new(() => new TrayIconManager());
+        internal static TrayIconManager Default => _default.Value;
 
-		internal SystemTrayIcon? SystemTrayIcon { get; set; }
-		internal TrayIconFlyout? TrayIconFlyout { get; set; }
-		internal TrayIconMenuFlyout? TrayIconMenuFlyout { get; set; }
-		internal FlyoutSampleKinds SelectedFlyoutExample { get; private set; }
+        internal SystemTrayIcon? SystemTrayIcon { get; set; }
+        internal TrayIconFlyout? TrayIconFlyout { get; set; }
+        internal TrayIconMenuFlyout? TrayIconMenuFlyout { get; set; }
+        internal FlyoutSampleKinds SelectedFlyoutExample { get; private set; }
 
-		private bool _disposed;
+        private bool _disposed;
 
-		private TrayIconManager() { }
+        private TrayIconManager() { }
 
-		internal void Initialize(SystemTrayIcon trayIcon)
-		{
-			TrayIconFlyout = CreateFlyout(SelectedFlyoutExample);
-			TrayIconMenuFlyout = new MainTrayIconMeunFlyout();
+        internal void Initialize(SystemTrayIcon trayIcon)
+        {
+            TrayIconFlyout = CreateFlyout(SelectedFlyoutExample);
+            TrayIconMenuFlyout = new MainTrayIconMeunFlyout();
 
-			SystemTrayIcon = trayIcon;
-			SystemTrayIcon.Show();
-			SystemTrayIcon.LeftClicked += SystemTrayIcon_LeftClicked;
-			SystemTrayIcon.RightClicked += SystemTrayIcon_RightClicked;
-		}
+            SystemTrayIcon = trayIcon;
+            SystemTrayIcon.Show();
+            SystemTrayIcon.LeftClicked += SystemTrayIcon_LeftClicked;
+            SystemTrayIcon.RightClicked += SystemTrayIcon_RightClicked;
+        }
 
-		internal void SwitchFlyout(FlyoutSampleKinds example)
-		{
-			if (_disposed || (TrayIconFlyout is not null && SelectedFlyoutExample == example))
-				return;
+        internal void SwitchFlyout(FlyoutSampleKinds example)
+        {
+            if (_disposed || (TrayIconFlyout is not null && SelectedFlyoutExample == example))
+                return;
 
-			var oldFlyout = TrayIconFlyout;
-			var newFlyout = CreateFlyout(example);
+            var oldFlyout = TrayIconFlyout;
+            var newFlyout = CreateFlyout(example);
 
-			TrayIconFlyout = newFlyout;
-			SelectedFlyoutExample = example;
-			oldFlyout?.Dispose();
-		}
+            TrayIconFlyout = newFlyout;
+            SelectedFlyoutExample = example;
+            oldFlyout?.Dispose();
+        }
 
-		private static TrayIconFlyout CreateFlyout(FlyoutSampleKinds example)
-		{
-			return example switch
-			{
-				FlyoutSampleKinds.StickySmallStyle => new StickySmallTrayIconFlyout(),
-				FlyoutSampleKinds.StartMenuStyle => new StartMenuStyleTrayIconFlyout(),
-				FlyoutSampleKinds.WidgetStyle => new WidgetStyleTrayIconFlyout(),
-				FlyoutSampleKinds.IndicatorStyle => new IndicatorStyleFlyout(),
-				_ => new MainTrayIconFlyout(),
-			};
-		}
+        private static TrayIconFlyout CreateFlyout(FlyoutSampleKinds example)
+        {
+            return example switch
+            {
+                FlyoutSampleKinds.StickySmallStyle => new StickySmallTrayIconFlyout(),
+                FlyoutSampleKinds.StartMenuStyle => new StartMenuStyleTrayIconFlyout(),
+                FlyoutSampleKinds.WidgetStyle => new WidgetStyleTrayIconFlyout(),
+                FlyoutSampleKinds.IndicatorStyle => new IndicatorStyleFlyout(),
+                _ => new MainTrayIconFlyout(),
+            };
+        }
 
-		private void SystemTrayIcon_LeftClicked(object? sender, MouseEventReceivedEventArgs e)
-		{
-			if (TrayIconFlyout is null)
-				return;
+        internal void ToggleFlyout(Point? point = null)
+        {
+            if (TrayIconFlyout is null)
+                return;
 
-			if (TrayIconFlyout.IsOpen)
-			{
-				TrayIconFlyout.Hide();
-			}
-			else
-			{
-				if (TrayIconFlyout is StickySmallTrayIconFlyout)
-				{
-					TrayIconFlyout.Show(e.Point);
+            if (TrayIconFlyout.IsOpen)
+            {
+                TrayIconFlyout.Hide();
+            }
+            else
+            {
+                if (TrayIconFlyout is StickySmallTrayIconFlyout && point is not null)
+                {
+                    TrayIconFlyout.Show(point.Value);
 
-				}
-				else
-				{
-					TrayIconFlyout.Show();
-				}
-			}
-		}
+                }
+                else
+                {
+                    TrayIconFlyout.Show();
+                }
+            }
+        }
 
-		private void SystemTrayIcon_RightClicked(object? sender, MouseEventReceivedEventArgs e)
-		{
-			if (TrayIconMenuFlyout is null)
-				return;
+        private void SystemTrayIcon_LeftClicked(object? sender, MouseEventReceivedEventArgs e)
+        {
+            ToggleFlyout(e.Point);
+        }
 
-			if (TrayIconMenuFlyout.IsOpen)
-				TrayIconMenuFlyout.Hide();
+        private void SystemTrayIcon_RightClicked(object? sender, MouseEventReceivedEventArgs e)
+        {
+            if (TrayIconMenuFlyout is null)
+                return;
 
-			TrayIconMenuFlyout.Show(new(e.Point.X, e.Point.Y - 32));
-		}
+            if (TrayIconMenuFlyout.IsOpen)
+                TrayIconMenuFlyout.Hide();
 
-		public void Dispose()
-		{
-			if (_disposed)
-				return;
+            TrayIconMenuFlyout.Show(new(e.Point.X, e.Point.Y - 32));
+        }
 
-			_disposed = true;
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
 
-			SystemTrayIcon?.LeftClicked -= SystemTrayIcon_LeftClicked;
-			SystemTrayIcon?.RightClicked -= SystemTrayIcon_RightClicked;
-			SystemTrayIcon?.Destroy();
-			TrayIconFlyout?.Dispose();
-			TrayIconMenuFlyout?.Dispose();
+            _disposed = true;
 
-			SystemTrayIcon = null;
-			TrayIconFlyout = null;
-			TrayIconMenuFlyout = null;
+            SystemTrayIcon?.LeftClicked -= SystemTrayIcon_LeftClicked;
+            SystemTrayIcon?.RightClicked -= SystemTrayIcon_RightClicked;
+            SystemTrayIcon?.Destroy();
+            TrayIconFlyout?.Dispose();
+            TrayIconMenuFlyout?.Dispose();
 
-			GC.SuppressFinalize(this);
-		}
-	}
+            SystemTrayIcon = null;
+            TrayIconFlyout = null;
+            TrayIconMenuFlyout = null;
+
+            GC.SuppressFinalize(this);
+        }
+    }
 }

@@ -2,11 +2,13 @@
 // Licensed under the MIT license.
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows.Input;
 
 namespace U5BFA.Libraries
 {
@@ -53,6 +55,8 @@ namespace U5BFA.Libraries
         public Dictionary<FlyoutSampleKinds, string> FlyoutExamples { get; private set; } = [];
         public Dictionary<BackdropKind, string> Backdrops { get; private set; } = [];
 
+        public ICommand ToggleFlyoutOpenCommand { get; }
+
         internal RootViewModel()
         {
             IconPath = TrayIconManager.Default.SystemTrayIcon?.IconPath;
@@ -87,6 +91,8 @@ namespace U5BFA.Libraries
             Backdrops.Add(BackdropKind.Acrylic, "Acrylic");
             Backdrops.Add(BackdropKind.Mica, "Mica");
             SelectedBackdropIndex = 0;
+
+            ToggleFlyoutOpenCommand = new RelayCommand(ExecuteToggleFlyoutOpenCommand);
         }
 
         partial void OnIconPathChanged(string? value)
@@ -196,6 +202,11 @@ namespace U5BFA.Libraries
             return double.IsNaN(value) || value <= 0
                 ? TimeSpan.Zero
                 : TimeSpan.FromSeconds(value);
+        }
+
+        private void ExecuteToggleFlyoutOpenCommand()
+        {
+            TrayIconManager.Default.ToggleFlyout();
         }
     }
 }

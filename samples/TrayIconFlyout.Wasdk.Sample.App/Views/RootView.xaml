@@ -44,6 +44,12 @@
                         ItemsSource="{x:Bind ViewModel.FlyoutExamples.Values}"
                         SelectedIndex="{x:Bind ViewModel.SelectedFlyoutExampleIndex, Mode=TwoWay}" />
                 </wctcontrols:SettingsCard>
+                <wctcontrols:SettingsCard Header="Flyout state">
+                    <Button
+                        Width="150"
+                        Command="{x:Bind ViewModel.ToggleFlyoutOpenCommand}"
+                        Content="Toggle open" />
+                </wctcontrols:SettingsCard>
                 <wctcontrols:SettingsCard Header="Popup direction">
                     <ComboBox
                         Width="150"
