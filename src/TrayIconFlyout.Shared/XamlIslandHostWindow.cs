@@ -184,6 +184,11 @@ namespace U5BFA.Libraries
 		}
 #endif
 
+		internal void NavigateFocus()
+		{
+			DesktopWindowXamlSource?.NavigateFocus(new XamlSourceFocusNavigationRequest(XamlSourceFocusNavigationReason.First));
+		}
+
 		private void InitializeDesktopWindowXamlSource()
 		{
 			DesktopWindowXamlSource = new();

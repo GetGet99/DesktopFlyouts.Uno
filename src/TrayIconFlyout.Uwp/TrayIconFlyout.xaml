@@ -23,7 +23,8 @@
 						x:Name="PART_RootGrid"
 						BorderBrush="{TemplateBinding BorderBrush}"
 						BorderThickness="{TemplateBinding BorderThickness}"
-						RenderTransformOrigin="0.5,0.5">
+						RenderTransformOrigin="0.5,0.5"
+						TabFocusNavigation="Cycle">
 						<Grid.RenderTransform>
 							<TranslateTransform X="0" Y="0" />
 						</Grid.RenderTransform>

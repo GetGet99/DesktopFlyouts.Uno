@@ -452,6 +452,7 @@ namespace U5BFA.Libraries
 			SetOpenTransform();
 			_isPopupAnimationPlaying = false;
 			IsOpen = true;
+			_host?.NavigateFocus();
 			RestartAutoCloseTimer();
 		}
 
