@@ -36,6 +36,10 @@
       <Deploy />
     </Project>
   </Folder>
+  <Folder Name="/src-cpp/">
+    <Project Path="src-cpp/TrayIconFlyout.Shared/TrayIconFlyout.Shared.vcxitems" Id="812b3310-7cdc-4d34-96a1-9ff0f7214a4b" />
+    <Project Path="src-cpp/TrayIconFlyout.Wasdk/TrayIconFlyout.Wasdk.vcxproj" Id="0a5b46ca-869c-4dc8-b309-98a99e464188" />
+  </Folder>
 
   <Folder Name="/src/">
     <Project Path="src/TrayIconFlyout.Shared/TrayIconFlyout.Shared.shproj" Id="97b61227-b152-453d-a2d1-f7a98fc83367" />
