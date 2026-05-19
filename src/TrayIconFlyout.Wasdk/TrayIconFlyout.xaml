@@ -66,6 +66,12 @@
 
                         <Grid x:Name="PART_BackdropTargetGrid" CornerRadius="{TemplateBinding CornerRadius}" />
 
+                        <!--<SystemBackdropElement>
+                            <SystemBackdropElement.SystemBackdrop>
+                                <MicaBackdrop />
+                            </SystemBackdropElement.SystemBackdrop>
+                        </SystemBackdropElement>-->
+
                         <ContentPresenter
                             x:Name="PART_MainContentPresenter"
                             HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
