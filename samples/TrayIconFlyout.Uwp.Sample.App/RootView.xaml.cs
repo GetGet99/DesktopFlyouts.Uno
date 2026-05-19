@@ -6,11 +6,11 @@ using Windows.UI.Xaml.Controls;
 
 namespace U5BFA.Libraries
 {
-	public sealed partial class RootView : UserControl
-	{
-		public RootView()
-		{
-			InitializeComponent();
-		}
-	}
+    public sealed partial class RootView : UserControl
+    {
+        public RootView()
+        {
+            InitializeComponent();
+        }
+    }
 }

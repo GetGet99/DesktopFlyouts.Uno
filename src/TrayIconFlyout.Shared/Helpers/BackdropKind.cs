@@ -3,9 +3,19 @@
 
 namespace U5BFA.Libraries
 {
-	public enum BackdropKind
-	{
-		Acrylic,
-		Mica,
-	}
+    /// <summary>
+    /// Specifies the system backdrop used by a flyout.
+    /// </summary>
+    public enum BackdropKind
+    {
+        /// <summary>
+        /// Uses an acrylic backdrop.
+        /// </summary>
+        Acrylic,
+
+        /// <summary>
+        /// Uses a mica backdrop.
+        /// </summary>
+        Mica,
+    }
 }

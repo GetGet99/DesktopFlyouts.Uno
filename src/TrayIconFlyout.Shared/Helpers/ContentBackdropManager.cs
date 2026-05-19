@@ -14,103 +14,103 @@ using Microsoft.UI.Xaml;
 namespace U5BFA.Libraries
 {
 #if WASDK
-	internal partial class ContentBackdropManager : IDisposable
-	{
-		private ISystemBackdropControllerWithTargets? _backdropController;
-		private SystemBackdropConfiguration? _configuration;
-		private Compositor? _compositor;
-		private readonly List<ContentExternalBackdropLink> _linkCollection = [];
-		private bool _disposed;
+    internal partial class ContentBackdropManager : IDisposable
+    {
+        private ISystemBackdropControllerWithTargets? _backdropController;
+        private SystemBackdropConfiguration? _configuration;
+        private Compositor? _compositor;
+        private readonly List<ContentExternalBackdropLink> _linkCollection = [];
+        private bool _disposed;
 
-		internal static ContentBackdropManager? Create(ISystemBackdropControllerWithTargets backdropController, Compositor compositor, ElementTheme elementTheme)
-		{
-			var configuration = new SystemBackdropConfiguration() { Theme = (SystemBackdropTheme)elementTheme };
-			backdropController.SetSystemBackdropConfiguration(configuration);
+        internal static ContentBackdropManager? Create(ISystemBackdropControllerWithTargets backdropController, Compositor compositor, ElementTheme elementTheme)
+        {
+            var configuration = new SystemBackdropConfiguration() { Theme = (SystemBackdropTheme)elementTheme };
+            backdropController.SetSystemBackdropConfiguration(configuration);
 
-			return DesktopAcrylicController.IsSupported()
-				? new ContentBackdropManager()
-				{
-					_compositor = compositor,
-					_backdropController = backdropController,
-					_configuration = configuration,
-				}
-				: null;
-		}
+            return DesktopAcrylicController.IsSupported()
+                ? new ContentBackdropManager()
+                {
+                    _compositor = compositor,
+                    _backdropController = backdropController,
+                    _configuration = configuration,
+                }
+                : null;
+        }
 
-		internal ContentExternalBackdropLink? CreateLink()
-		{
-			if (_disposed || _backdropController is null || _compositor is null)
-				return null;
+        internal ContentExternalBackdropLink? CreateLink()
+        {
+            if (_disposed || _backdropController is null || _compositor is null)
+                return null;
 
-			var backdropLink = ContentExternalBackdropLink.Create(_compositor);
-			backdropLink.ExternalBackdropBorderMode = CompositionBorderMode.Soft;
-			_backdropController.AddSystemBackdropTarget(backdropLink);
-			_linkCollection.Add(backdropLink);
-			return backdropLink;
-		}
+            var backdropLink = ContentExternalBackdropLink.Create(_compositor);
+            backdropLink.ExternalBackdropBorderMode = CompositionBorderMode.Soft;
+            _backdropController.AddSystemBackdropTarget(backdropLink);
+            _linkCollection.Add(backdropLink);
+            return backdropLink;
+        }
 
-		internal void RemoveLink(ContentExternalBackdropLink backdropLink)
-		{
-			if (!_linkCollection.Remove(backdropLink))
-				return;
+        internal void RemoveLink(ContentExternalBackdropLink backdropLink)
+        {
+            if (!_linkCollection.Remove(backdropLink))
+                return;
 
-			DetachAndDisposeLink(backdropLink);
-		}
+            DetachAndDisposeLink(backdropLink);
+        }
 
-		private void DetachAndDisposeLink(ContentExternalBackdropLink backdropLink)
-		{
-			try
-			{
-				_backdropController?.RemoveSystemBackdropTarget(backdropLink);
-			}
-			catch
-			{
-			}
+        private void DetachAndDisposeLink(ContentExternalBackdropLink backdropLink)
+        {
+            try
+            {
+                _backdropController?.RemoveSystemBackdropTarget(backdropLink);
+            }
+            catch
+            {
+            }
 
-			try
-			{
-				backdropLink.Dispose();
-			}
-			catch
-			{
-			}
-		}
+            try
+            {
+                backdropLink.Dispose();
+            }
+            catch
+            {
+            }
+        }
 
-		internal void UpdateTheme(ElementTheme elementTheme)
-		{
-			if (_configuration is null)
-				return;
+        internal void UpdateTheme(ElementTheme elementTheme)
+        {
+            if (_configuration is null)
+                return;
 
-			_configuration.Theme = (SystemBackdropTheme)elementTheme;
-		}
+            _configuration.Theme = (SystemBackdropTheme)elementTheme;
+        }
 
-		public void Dispose()
-		{
-			if (_disposed)
-				return;
+        public void Dispose()
+        {
+            if (_disposed)
+                return;
 
-			_disposed = true;
+            _disposed = true;
 
-			// Detach only the links we own. RemoveAllSystemBackdropTargets can throw
-			// during app shutdown after WinAppSDK has already torn down some targets.
-			foreach (ContentExternalBackdropLink contentExternalBackdropLink in _linkCollection.ToArray())
-			{
-				_linkCollection.Remove(contentExternalBackdropLink);
-				DetachAndDisposeLink(contentExternalBackdropLink);
-			}
+            // Detach only the links we own. RemoveAllSystemBackdropTargets can throw
+            // during app shutdown after WinAppSDK has already torn down some targets.
+            foreach (ContentExternalBackdropLink contentExternalBackdropLink in _linkCollection.ToArray())
+            {
+                _linkCollection.Remove(contentExternalBackdropLink);
+                DetachAndDisposeLink(contentExternalBackdropLink);
+            }
 
-			try
-			{
-				_backdropController?.Dispose();
-			}
-			catch
-			{
-			}
+            try
+            {
+                _backdropController?.Dispose();
+            }
+            catch
+            {
+            }
 
-			_backdropController = null;
-			_configuration = null;
-			_compositor = null;
-		}
-	}
+            _backdropController = null;
+            _configuration = null;
+            _compositor = null;
+        }
+    }
 #endif
 }

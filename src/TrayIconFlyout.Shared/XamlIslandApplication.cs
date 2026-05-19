@@ -6,8 +6,11 @@ using Windows.UI.Xaml;
 namespace TrayIconFlyout.Shared
 {
 #if UWP
-	public partial class XamlIslandApplication : Application
-	{
-	}
+    /// <summary>
+    /// Provides the UWP XAML application used by XAML island hosting.
+    /// </summary>
+    public partial class XamlIslandApplication : Application
+    {
+    }
 #endif
 }

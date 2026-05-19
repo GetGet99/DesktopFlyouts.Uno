@@ -18,101 +18,150 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 
 namespace U5BFA.Libraries
 {
-	public partial class TrayIconFlyout
-	{
-		private readonly ObservableCollection<TrayIconFlyoutIsland> _islands = [];
-		public IList<TrayIconFlyoutIsland> Islands => _islands;
+    public partial class TrayIconFlyout
+    {
+        private readonly ObservableCollection<TrayIconFlyoutIsland> _islands = [];
 
-		[GeneratedDependencyProperty]
-		public partial object? IslandsSource { get; set; }
+        /// <summary>
+        /// Gets the islands displayed in the flyout.
+        /// </summary>
+        public IList<TrayIconFlyoutIsland> Islands => _islands;
 
-		[GeneratedDependencyProperty(DefaultValue = true)]
-		public partial bool IsBackdropEnabled { get; set; }
+        /// <summary>
+        /// Gets or sets a source collection for flyout islands.
+        /// </summary>
+        [GeneratedDependencyProperty]
+        public partial object? IslandsSource { get; set; }
 
-		public static readonly DependencyProperty IsOpenProperty =
-			DependencyProperty.Register(nameof(IsOpen), typeof(bool), typeof(TrayIconFlyout), new PropertyMetadata(false));
+        /// <summary>
+        /// Gets or sets whether island backdrops are enabled.
+        /// </summary>
+        [GeneratedDependencyProperty(DefaultValue = true)]
+        public partial bool IsBackdropEnabled { get; set; }
 
-		public bool IsOpen
-		{
-			get => (bool)GetValue(IsOpenProperty);
-			private set => SetValue(IsOpenProperty, value);
-		}
+        /// <summary>
+        /// Gets whether the flyout is currently open.
+        /// </summary>
+        [GeneratedDependencyProperty]
+        public partial bool IsOpen { get; private set; }
 
-		public static readonly DependencyProperty FlyoutWidthProperty =
-			DependencyProperty.Register(nameof(FlyoutWidth), typeof(GridLength), typeof(TrayIconFlyout), new PropertyMetadata(GridLength.Auto, OnFlyoutSizePropertyChanged));
+        /// <summary>
+        /// Identifies the <see cref="FlyoutWidth"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty FlyoutWidthProperty =
+            DependencyProperty.Register(nameof(FlyoutWidth), typeof(GridLength), typeof(TrayIconFlyout), new PropertyMetadata(GridLength.Auto, OnFlyoutSizePropertyChanged));
 
-		public GridLength FlyoutWidth
-		{
-			get => (GridLength)GetValue(FlyoutWidthProperty);
-			set => SetValue(FlyoutWidthProperty, value);
-		}
+        /// <summary>
+        /// Gets or sets the requested flyout width.
+        /// </summary>
+        public GridLength FlyoutWidth
+        {
+            get => (GridLength)GetValue(FlyoutWidthProperty);
+            set => SetValue(FlyoutWidthProperty, value);
+        }
 
-		public static readonly DependencyProperty FlyoutHeightProperty =
-			DependencyProperty.Register(nameof(FlyoutHeight), typeof(GridLength), typeof(TrayIconFlyout), new PropertyMetadata(GridLength.Auto, OnFlyoutSizePropertyChanged));
+        /// <summary>
+        /// Identifies the <see cref="FlyoutHeight"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty FlyoutHeightProperty =
+            DependencyProperty.Register(nameof(FlyoutHeight), typeof(GridLength), typeof(TrayIconFlyout), new PropertyMetadata(GridLength.Auto, OnFlyoutSizePropertyChanged));
 
-		public GridLength FlyoutHeight
-		{
-			get => (GridLength)GetValue(FlyoutHeightProperty);
-			set => SetValue(FlyoutHeightProperty, value);
-		}
+        /// <summary>
+        /// Gets or sets the requested flyout height.
+        /// </summary>
+        public GridLength FlyoutHeight
+        {
+            get => (GridLength)GetValue(FlyoutHeightProperty);
+            set => SetValue(FlyoutHeightProperty, value);
+        }
 
-		[GeneratedDependencyProperty(DefaultValue = TrayIconFlyoutPopupDirection.Vertical)]
-		public partial TrayIconFlyoutPopupDirection PopupDirection { get; set; }
+        /// <summary>
+        /// Gets or sets the preferred popup direction.
+        /// </summary>
+        [GeneratedDependencyProperty(DefaultValue = TrayIconFlyoutPopupDirection.Vertical)]
+        public partial TrayIconFlyoutPopupDirection PopupDirection { get; set; }
 
-		[GeneratedDependencyProperty(DefaultValue = Orientation.Vertical)]
-		public partial Orientation IslandsOrientation { get; set; }
+        /// <summary>
+        /// Gets or sets how islands are arranged.
+        /// </summary>
+        [GeneratedDependencyProperty(DefaultValue = Orientation.Vertical)]
+        public partial Orientation IslandsOrientation { get; set; }
 
-		[GeneratedDependencyProperty(DefaultValue = FlyoutPlacementMode.BottomEdgeAlignedRight)]
-		public partial FlyoutPlacementMode Placement { get; set; }
+        /// <summary>
+        /// Gets or sets the flyout placement on the work area.
+        /// </summary>
+        [GeneratedDependencyProperty(DefaultValue = FlyoutPlacementMode.BottomEdgeAlignedRight)]
+        public partial FlyoutPlacementMode Placement { get; set; }
 
-		[GeneratedDependencyProperty]
-		public partial MenuFlyout? MenuFlyout { get; set; }
+        /// <summary>
+        /// Gets or sets the menu flyout associated with the tray icon.
+        /// </summary>
+        [GeneratedDependencyProperty]
+        public partial MenuFlyout? MenuFlyout { get; set; }
 
-		[GeneratedDependencyProperty(DefaultValue = true)]
-		public partial bool IsTransitionAnimationEnabled { get; set; }
+        /// <summary>
+        /// Gets or sets whether open and close transitions are enabled.
+        /// </summary>
+        [GeneratedDependencyProperty(DefaultValue = true)]
+        public partial bool IsTransitionAnimationEnabled { get; set; }
 
-		[GeneratedDependencyProperty(DefaultValue = true)]
-		public partial bool HideOnLostFocus { get; set; }
+        /// <summary>
+        /// Gets or sets whether the flyout closes when it loses focus.
+        /// </summary>
+        [GeneratedDependencyProperty(DefaultValue = true)]
+        public partial bool HideOnLostFocus { get; set; }
 
-		[GeneratedDependencyProperty(DefaultValue = FlyoutActivationMode.Activate)]
-		public partial FlyoutActivationMode ActivationMode { get; set; }
+        /// <summary>
+        /// Gets or sets how the flyout participates in activation and focus.
+        /// </summary>
+        [GeneratedDependencyProperty(DefaultValue = FlyoutActivationMode.Activate)]
+        public partial FlyoutActivationMode ActivationMode { get; set; }
 
-		public static readonly DependencyProperty AutoCloseDelayProperty =
-			DependencyProperty.Register(nameof(AutoCloseDelay), typeof(TimeSpan), typeof(TrayIconFlyout), new PropertyMetadata(TimeSpan.Zero, OnAutoCloseDelayPropertyChanged));
+        /// <summary>
+        /// Identifies the <see cref="AutoCloseDelay"/> dependency property.
+        /// </summary>
+        public static readonly DependencyProperty AutoCloseDelayProperty =
+            DependencyProperty.Register(nameof(AutoCloseDelay), typeof(TimeSpan), typeof(TrayIconFlyout), new PropertyMetadata(TimeSpan.Zero, OnAutoCloseDelayPropertyChanged));
 
-		public TimeSpan AutoCloseDelay
-		{
-			get => (TimeSpan)GetValue(AutoCloseDelayProperty);
-			set => SetValue(AutoCloseDelayProperty, value);
-		}
+        /// <summary>
+        /// Gets or sets the delay before the flyout closes automatically.
+        /// </summary>
+        public TimeSpan AutoCloseDelay
+        {
+            get => (TimeSpan)GetValue(AutoCloseDelayProperty);
+            set => SetValue(AutoCloseDelayProperty, value);
+        }
 
-		[GeneratedDependencyProperty(DefaultValue = BackdropKind.Acrylic)]
-		public partial BackdropKind BackdropKind { get; set; }
+        /// <summary>
+        /// Gets or sets the backdrop kind used by flyout islands.
+        /// </summary>
+        [GeneratedDependencyProperty(DefaultValue = BackdropKind.Acrylic)]
+        public partial BackdropKind BackdropKind { get; set; }
 
-		private static void OnFlyoutSizePropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
-		{
-			if (dependencyObject is TrayIconFlyout flyout)
-				flyout.UpdateOpenFlyoutLayout();
-		}
+        private static void OnFlyoutSizePropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
+        {
+            if (dependencyObject is TrayIconFlyout flyout)
+                flyout.UpdateOpenFlyoutLayout();
+        }
 
-		private static void OnAutoCloseDelayPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
-		{
-			if (dependencyObject is TrayIconFlyout flyout)
-				flyout.RestartAutoCloseTimer();
-		}
+        private static void OnAutoCloseDelayPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
+        {
+            if (dependencyObject is TrayIconFlyout flyout)
+                flyout.RestartAutoCloseTimer();
+        }
 
-		partial void OnIslandsSourcePropertyChanged(DependencyPropertyChangedEventArgs e)
-		{
-			if (e.NewValue is not IEnumerable<TrayIconFlyoutIsland> newIslands)
-				return;
+        partial void OnIslandsSourcePropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue is not IEnumerable<TrayIconFlyoutIsland> newIslands)
+                return;
 
-			Islands.Clear();
+            Islands.Clear();
 
-			foreach (var island in newIslands)
-				Islands.Add(island);
+            foreach (var island in newIslands)
+                Islands.Add(island);
 
-			UpdateIslands();
-		}
+            UpdateIslands();
+        }
 
         partial void OnIslandsOrientationPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
@@ -120,36 +169,36 @@ namespace U5BFA.Libraries
                 return;
 
             UpdateIslands();
-			UpdateOpenFlyoutLayout();
+            UpdateOpenFlyoutLayout();
         }
 
-		partial void OnIsBackdropEnabledPropertyChanged(DependencyPropertyChangedEventArgs e)
-		{
-			if ((bool)e.NewValue == (bool)e.OldValue)
-				return;
+        partial void OnIsBackdropEnabledPropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            if ((bool)e.NewValue == (bool)e.OldValue)
+                return;
 
 #if WASDK
-			UpdateBackdropManager(true);
+            UpdateBackdropManager(true);
 #endif
-		}
+        }
 
-		partial void OnBackdropKindPropertyChanged(DependencyPropertyChangedEventArgs e)
-		{
-			if ((BackdropKind)e.NewValue == (BackdropKind)e.OldValue)
-				return;
+        partial void OnBackdropKindPropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            if ((BackdropKind)e.NewValue == (BackdropKind)e.OldValue)
+                return;
 
 #if WASDK
-			UpdateBackdropManager(true);
+            UpdateBackdropManager(true);
 #endif
-		}
+        }
 
-		partial void OnActivationModePropertyChanged(DependencyPropertyChangedEventArgs e)
-		{
-			if ((FlyoutActivationMode)e.NewValue == (FlyoutActivationMode)e.OldValue)
-				return;
+        partial void OnActivationModePropertyChanged(DependencyPropertyChangedEventArgs e)
+        {
+            if ((FlyoutActivationMode)e.NewValue == (FlyoutActivationMode)e.OldValue)
+                return;
 
-			_host?.SetActivationMode((FlyoutActivationMode)e.NewValue);
-			UpdateFocusSuppression();
-		}
-	}
+            _host?.SetActivationMode((FlyoutActivationMode)e.NewValue);
+            UpdateFocusSuppression();
+        }
+    }
 }

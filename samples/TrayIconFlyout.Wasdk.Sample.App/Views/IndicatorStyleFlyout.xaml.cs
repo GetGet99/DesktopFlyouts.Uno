@@ -15,7 +15,7 @@ namespace U5BFA.Libraries
 
     public sealed partial class Something : ItemsRepeater
     {
-    
+
     }
 
 }

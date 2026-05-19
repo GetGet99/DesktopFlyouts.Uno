@@ -3,11 +3,11 @@
 
 namespace U5BFA.Libraries
 {
-	internal sealed partial class RootView : Microsoft.UI.Xaml.Controls.UserControl
-	{
-		public RootView()
-		{
-			InitializeComponent();
-		}
-	}
+    internal sealed partial class RootView : Microsoft.UI.Xaml.Controls.UserControl
+    {
+        public RootView()
+        {
+            InitializeComponent();
+        }
+    }
 }

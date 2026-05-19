@@ -7,16 +7,16 @@ using Windows.UI.Xaml.Controls;
 
 namespace U5BFA.Libraries
 {
-	public sealed partial class MainPage : Page
-	{
-		public MainPage()
-		{
-			InitializeComponent();
-		}
+    public sealed partial class MainPage : Page
+    {
+        public MainPage()
+        {
+            InitializeComponent();
+        }
 
-		private void CloseApp(object sender, Windows.UI.Xaml.RoutedEventArgs e)
-		{
-			CoreApplication.Exit();
-		}
-	}
+        private void CloseApp(object sender, Windows.UI.Xaml.RoutedEventArgs e)
+        {
+            CoreApplication.Exit();
+        }
+    }
 }

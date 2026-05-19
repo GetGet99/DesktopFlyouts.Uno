@@ -12,7 +12,9 @@
     </UserControl.DataContext>
 
     <ScrollViewer>
-        <StackPanel Padding="24" Spacing="24">
+        <StackPanel Padding="36" Spacing="24">
+
+            <TextBlock Style="{StaticResource TitleTextBlockStyle}" Text="Tray icon sample" />
 
             <StackPanel Spacing="4">
                 <TextBlock

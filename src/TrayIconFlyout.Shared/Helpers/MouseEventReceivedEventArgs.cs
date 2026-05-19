@@ -6,13 +6,19 @@ using System.Drawing;
 
 namespace U5BFA.Libraries
 {
-	public class MouseEventReceivedEventArgs : EventArgs
-	{
-		public Point Point { get; }
+    /// <summary>
+    /// Provides the screen point associated with a tray icon mouse event.
+    /// </summary>
+    public class MouseEventReceivedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Gets the screen point associated with the mouse event.
+        /// </summary>
+        public Point Point { get; }
 
-		internal MouseEventReceivedEventArgs(Point point)
-		{
-			Point = point;
-		}
-	}
+        internal MouseEventReceivedEventArgs(Point point)
+        {
+            Point = point;
+        }
+    }
 }

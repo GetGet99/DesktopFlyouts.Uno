@@ -7,16 +7,16 @@ using Windows.UI.Xaml;
 
 namespace U5BFA.Libraries
 {
-	public static class Program
-	{
-		static void Main(string[] args)
-		{
-			Application.Start((p) =>
-			{
-				var context = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
-				SynchronizationContext.SetSynchronizationContext(context);
-				new App();
-			});
-		}
-	}
+    public static class Program
+    {
+        static void Main(string[] args)
+        {
+            Application.Start((p) =>
+            {
+                var context = new DispatcherQueueSynchronizationContext(DispatcherQueue.GetForCurrentThread());
+                SynchronizationContext.SetSynchronizationContext(context);
+                new App();
+            });
+        }
+    }
 }

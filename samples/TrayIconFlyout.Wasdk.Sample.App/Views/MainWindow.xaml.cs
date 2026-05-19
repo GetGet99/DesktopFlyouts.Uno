@@ -5,15 +5,15 @@ using Microsoft.UI.Xaml;
 
 namespace U5BFA.Libraries
 {
-	public sealed partial class MainWindow : Window
-	{
-		public MainWindow()
-		{
-			InitializeComponent();
+    public sealed partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
 
-			AppWindow.Resize(new(600, 900));
-			ExtendsContentIntoTitleBar = true;
-			Content = new RootView();
-		}
-	}
+            AppWindow.Resize(new(600, 900));
+            ExtendsContentIntoTitleBar = true;
+            Content = new RootView();
+        }
+    }
 }

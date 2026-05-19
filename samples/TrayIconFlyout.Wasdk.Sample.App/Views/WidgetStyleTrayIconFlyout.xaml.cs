@@ -3,11 +3,11 @@
 
 namespace U5BFA.Libraries
 {
-	public sealed partial class WidgetStyleTrayIconFlyout : TrayIconFlyout
-	{
-		public WidgetStyleTrayIconFlyout()
-		{
-			InitializeComponent();
-		}
-	}
+    public sealed partial class WidgetStyleTrayIconFlyout : TrayIconFlyout
+    {
+        public WidgetStyleTrayIconFlyout()
+        {
+            InitializeComponent();
+        }
+    }
 }

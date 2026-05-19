@@ -8,18 +8,18 @@ using Windows.Win32.UI.WindowsAndMessaging;
 
 namespace U5BFA.Libraries
 {
-	internal unsafe static class WindowHelpers
-	{
-		internal static Point GetBottomRightCornerPoint()
-		{
-			RECT rect;
-			PInvoke.SystemParametersInfo(SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETWORKAREA, 0, &rect, 0);
+    internal unsafe static class WindowHelpers
+    {
+        internal static Point GetBottomRightCornerPoint()
+        {
+            RECT rect;
+            PInvoke.SystemParametersInfo(SYSTEM_PARAMETERS_INFO_ACTION.SPI_GETWORKAREA, 0, &rect, 0);
 
-			Point point = default;
-			point.X = rect.right;
-			point.Y = rect.bottom;
+            Point point = default;
+            point.X = rect.right;
+            point.Y = rect.bottom;
 
-			return point;
-		}
-	}
+            return point;
+        }
+    }
 }

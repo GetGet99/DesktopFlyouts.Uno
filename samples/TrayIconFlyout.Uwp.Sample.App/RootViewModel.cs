@@ -5,10 +5,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace U5BFA.Libraries
 {
-	internal partial class RootViewModel : ObservableObject
-	{
-		internal RootViewModel()
-		{
-		}
-	}
+    internal partial class RootViewModel : ObservableObject
+    {
+        internal RootViewModel()
+        {
+        }
+    }
 }

@@ -13,92 +13,92 @@ using WinRT;
 
 namespace U5BFA.Libraries
 {
-	public sealed partial class App : Application
-	{
-		private bool _isTrayHostLaunchRequested;
+    public sealed partial class App : Application
+    {
+        private bool _isTrayHostLaunchRequested;
 
-		public App()
-		{
-			InitializeComponent();
+        public App()
+        {
+            InitializeComponent();
 
-			Suspending += OnSuspending;
-		}
+            Suspending += OnSuspending;
+        }
 
-		protected override async void OnLaunched(LaunchActivatedEventArgs args)
-		{
-			InitializeWindow(args.PreviousExecutionState, args.Arguments);
-			await LaunchTrayHostAsync();
-		}
+        protected override async void OnLaunched(LaunchActivatedEventArgs args)
+        {
+            InitializeWindow(args.PreviousExecutionState, args.Arguments);
+            await LaunchTrayHostAsync();
+        }
 
-		protected override void OnActivated(IActivatedEventArgs args)
-		{
-			object? navigationParameter = null;
-			if (args.Kind is ActivationKind.Protocol)
-			{
-				navigationParameter = args.As<ProtocolActivatedEventArgs>().Data;
-			}
+        protected override void OnActivated(IActivatedEventArgs args)
+        {
+            object? navigationParameter = null;
+            if (args.Kind is ActivationKind.Protocol)
+            {
+                navigationParameter = args.As<ProtocolActivatedEventArgs>().Data;
+            }
 
-			InitializeWindow(args.PreviousExecutionState, navigationParameter);
-		}
+            InitializeWindow(args.PreviousExecutionState, navigationParameter);
+        }
 
-		private void InitializeWindow(ApplicationExecutionState previousExecutionState, object? navigationParameter)
-		{
-			// Do not repeat app initialization when the Window already has content,
-			// just ensure that the window is active.
-			if (Window.Current.Content is not Frame rootFrame)
-			{
-				// Create a Frame to act as the navigation context and navigate to the first page
-				rootFrame = new Frame();
-				rootFrame.NavigationFailed += OnNavigationFailed;
+        private void InitializeWindow(ApplicationExecutionState previousExecutionState, object? navigationParameter)
+        {
+            // Do not repeat app initialization when the Window already has content,
+            // just ensure that the window is active.
+            if (Window.Current.Content is not Frame rootFrame)
+            {
+                // Create a Frame to act as the navigation context and navigate to the first page
+                rootFrame = new Frame();
+                rootFrame.NavigationFailed += OnNavigationFailed;
 
-				if (previousExecutionState == ApplicationExecutionState.Terminated)
-				{
-					// TODO: Load state from previously suspended application
-				}
+                if (previousExecutionState == ApplicationExecutionState.Terminated)
+                {
+                    // TODO: Load state from previously suspended application
+                }
 
-				// Place the frame in the current Window
-				Window.Current.Content = rootFrame;
-			}
+                // Place the frame in the current Window
+                Window.Current.Content = rootFrame;
+            }
 
-			if (rootFrame.Content == null)
-			{
-				CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true; 
-				
-				rootFrame.Navigate(typeof(MainPage), navigationParameter);
-			}
+            if (rootFrame.Content == null)
+            {
+                CoreApplication.GetCurrentView().TitleBar.ExtendViewIntoTitleBar = true;
 
-			// Ensure the current window is active
-			Window.Current.Activate();
-		}
+                rootFrame.Navigate(typeof(MainPage), navigationParameter);
+            }
 
-		private async System.Threading.Tasks.Task LaunchTrayHostAsync()
-		{
-			if (_isTrayHostLaunchRequested)
-				return;
+            // Ensure the current window is active
+            Window.Current.Activate();
+        }
 
-			_isTrayHostLaunchRequested = true;
+        private async System.Threading.Tasks.Task LaunchTrayHostAsync()
+        {
+            if (_isTrayHostLaunchRequested)
+                return;
 
-			try
-			{
-				await FullTrustProcessLauncher.LaunchFullTrustProcessForCurrentAppAsync();
-			}
-			catch (Exception ex)
-			{
-				Debug.WriteLine($"Failed to launch tray host process: {ex}");
-			}
-		}
+            _isTrayHostLaunchRequested = true;
 
-		private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
-		{
-			throw new Exception($"Failed to load page '{e.SourcePageType.FullName}'.");
-		}
+            try
+            {
+                await FullTrustProcessLauncher.LaunchFullTrustProcessForCurrentAppAsync();
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Failed to launch tray host process: {ex}");
+            }
+        }
 
-		private void OnSuspending(object sender, SuspendingEventArgs e)
-		{
-			SuspendingDeferral deferral = e.SuspendingOperation.GetDeferral();
+        private void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
+        {
+            throw new Exception($"Failed to load page '{e.SourcePageType.FullName}'.");
+        }
 
-			// TODO: Save application state and stop any background activity
-			deferral.Complete();
-		}
-	}
+        private void OnSuspending(object sender, SuspendingEventArgs e)
+        {
+            SuspendingDeferral deferral = e.SuspendingOperation.GetDeferral();
+
+            // TODO: Save application state and stop any background activity
+            deferral.Complete();
+        }
+    }
 }

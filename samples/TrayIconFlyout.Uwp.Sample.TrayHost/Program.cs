@@ -5,12 +5,12 @@ using System;
 
 namespace U5BFA.Libraries
 {
-	public class Program
-	{
-		[STAThread]
-		static void Main()
-		{
-			_ = new TrayHostApp();
-		}
-	}
+    public class Program
+    {
+        [STAThread]
+        static void Main()
+        {
+            _ = new TrayHostApp();
+        }
+    }
 }

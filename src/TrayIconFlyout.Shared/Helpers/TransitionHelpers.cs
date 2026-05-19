@@ -13,110 +13,110 @@ using Microsoft.UI.Xaml.Media.Animation;
 
 namespace U5BFA.Libraries
 {
-	internal static class TransitionHelpers
-	{
-		internal static Storyboard GetWindows11BottomToTopTransitionStoryboard(DependencyObject target, int from, int to)
-		{
-			var storyboard = new Storyboard();
+    internal static class TransitionHelpers
+    {
+        internal static Storyboard GetWindows11BottomToTopTransitionStoryboard(DependencyObject target, int from, int to)
+        {
+            var storyboard = new Storyboard();
 
-			var keyFrames = new DoubleAnimationUsingKeyFrames() { EnableDependentAnimation = true };
-			keyFrames.KeyFrames.Add(new DiscreteDoubleKeyFrame()
-			{
-				KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(0)),
-				Value = from,
-			});
+            var keyFrames = new DoubleAnimationUsingKeyFrames() { EnableDependentAnimation = true };
+            keyFrames.KeyFrames.Add(new DiscreteDoubleKeyFrame()
+            {
+                KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(0)),
+                Value = from,
+            });
 
-			keyFrames.KeyFrames.Add(new SplineDoubleKeyFrame()
-			{
-				KeySpline = new() { ControlPoint1 = new(0.1, 0.9), ControlPoint2 = new(0.4, 1.0) },
-				KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(267)),
-				Value = to,
-			});
+            keyFrames.KeyFrames.Add(new SplineDoubleKeyFrame()
+            {
+                KeySpline = new() { ControlPoint1 = new(0.1, 0.9), ControlPoint2 = new(0.4, 1.0) },
+                KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(267)),
+                Value = to,
+            });
 
-			Storyboard.SetTarget(keyFrames, target);
-			Storyboard.SetTargetProperty(keyFrames, "(UIElement.RenderTransform).(TranslateTransform.Y)");
+            Storyboard.SetTarget(keyFrames, target);
+            Storyboard.SetTargetProperty(keyFrames, "(UIElement.RenderTransform).(TranslateTransform.Y)");
 
-			storyboard.Children.Add(keyFrames);
+            storyboard.Children.Add(keyFrames);
 
-			return storyboard;
-		}
+            return storyboard;
+        }
 
-		internal static Storyboard GetWindows11TopToBottomTransitionStoryboard(DependencyObject target, int from, int to)
-		{
-			var storyboard = new Storyboard();
+        internal static Storyboard GetWindows11TopToBottomTransitionStoryboard(DependencyObject target, int from, int to)
+        {
+            var storyboard = new Storyboard();
 
-			var keyFrames = new DoubleAnimationUsingKeyFrames() { EnableDependentAnimation = true };
-			keyFrames.KeyFrames.Add(new DiscreteDoubleKeyFrame()
-			{
-				KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(0)),
-				Value = from,
-			});
+            var keyFrames = new DoubleAnimationUsingKeyFrames() { EnableDependentAnimation = true };
+            keyFrames.KeyFrames.Add(new DiscreteDoubleKeyFrame()
+            {
+                KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(0)),
+                Value = from,
+            });
 
-			keyFrames.KeyFrames.Add(new SplineDoubleKeyFrame()
-			{
-				KeySpline = new() { ControlPoint1 = new(0.2, 0.0), ControlPoint2 = new(0.9, 0.0) },
-				KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(200)),
-				Value = to,
-			});
+            keyFrames.KeyFrames.Add(new SplineDoubleKeyFrame()
+            {
+                KeySpline = new() { ControlPoint1 = new(0.2, 0.0), ControlPoint2 = new(0.9, 0.0) },
+                KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(200)),
+                Value = to,
+            });
 
-			Storyboard.SetTarget(keyFrames, target);
-			Storyboard.SetTargetProperty(keyFrames, "(UIElement.RenderTransform).(TranslateTransform.Y)");
+            Storyboard.SetTarget(keyFrames, target);
+            Storyboard.SetTargetProperty(keyFrames, "(UIElement.RenderTransform).(TranslateTransform.Y)");
 
-			storyboard.Children.Add(keyFrames);
+            storyboard.Children.Add(keyFrames);
 
-			return storyboard;
-		}
+            return storyboard;
+        }
 
-		internal static Storyboard GetWindows11RightToLeftTransitionStoryboard(DependencyObject target, int from, int to)
-		{
-			var storyboard = new Storyboard();
+        internal static Storyboard GetWindows11RightToLeftTransitionStoryboard(DependencyObject target, int from, int to)
+        {
+            var storyboard = new Storyboard();
 
-			var keyFrames = new DoubleAnimationUsingKeyFrames() { EnableDependentAnimation = true };
-			keyFrames.KeyFrames.Add(new DiscreteDoubleKeyFrame()
-			{
-				KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(0)),
-				Value = from,
-			});
+            var keyFrames = new DoubleAnimationUsingKeyFrames() { EnableDependentAnimation = true };
+            keyFrames.KeyFrames.Add(new DiscreteDoubleKeyFrame()
+            {
+                KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(0)),
+                Value = from,
+            });
 
-			keyFrames.KeyFrames.Add(new SplineDoubleKeyFrame()
-			{
-				KeySpline = new() { ControlPoint1 = new(0.1, 0.9), ControlPoint2 = new(0.4, 1.0) },
-				KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(167)),
-				Value = to,
-			});
+            keyFrames.KeyFrames.Add(new SplineDoubleKeyFrame()
+            {
+                KeySpline = new() { ControlPoint1 = new(0.1, 0.9), ControlPoint2 = new(0.4, 1.0) },
+                KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(167)),
+                Value = to,
+            });
 
-			Storyboard.SetTarget(keyFrames, target);
-			Storyboard.SetTargetProperty(keyFrames, "(UIElement.RenderTransform).(TranslateTransform.X)");
+            Storyboard.SetTarget(keyFrames, target);
+            Storyboard.SetTargetProperty(keyFrames, "(UIElement.RenderTransform).(TranslateTransform.X)");
 
-			storyboard.Children.Add(keyFrames);
+            storyboard.Children.Add(keyFrames);
 
-			return storyboard;
-		}
+            return storyboard;
+        }
 
-		internal static Storyboard GetWindows11LeftToRightTransitionStoryboard(DependencyObject target, int from, int to)
-		{
-			var storyboard = new Storyboard();
+        internal static Storyboard GetWindows11LeftToRightTransitionStoryboard(DependencyObject target, int from, int to)
+        {
+            var storyboard = new Storyboard();
 
-			var keyFrames = new DoubleAnimationUsingKeyFrames() { EnableDependentAnimation = true };
-			keyFrames.KeyFrames.Add(new DiscreteDoubleKeyFrame()
-			{
-				KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(0)),
-				Value = from,
-			});
+            var keyFrames = new DoubleAnimationUsingKeyFrames() { EnableDependentAnimation = true };
+            keyFrames.KeyFrames.Add(new DiscreteDoubleKeyFrame()
+            {
+                KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(0)),
+                Value = from,
+            });
 
-			keyFrames.KeyFrames.Add(new SplineDoubleKeyFrame()
-			{
-				KeySpline = new() { ControlPoint1 = new(0.2, 0.0), ControlPoint2 = new(0.9, 0.0) },
-				KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(167)),
-				Value = to,
-			});
+            keyFrames.KeyFrames.Add(new SplineDoubleKeyFrame()
+            {
+                KeySpline = new() { ControlPoint1 = new(0.2, 0.0), ControlPoint2 = new(0.9, 0.0) },
+                KeyTime = KeyTime.FromTimeSpan(TimeSpan.FromMilliseconds(167)),
+                Value = to,
+            });
 
-			Storyboard.SetTarget(keyFrames, target);
-			Storyboard.SetTargetProperty(keyFrames, "(UIElement.RenderTransform).(TranslateTransform.X)");
+            Storyboard.SetTarget(keyFrames, target);
+            Storyboard.SetTargetProperty(keyFrames, "(UIElement.RenderTransform).(TranslateTransform.X)");
 
-			storyboard.Children.Add(keyFrames);
+            storyboard.Children.Add(keyFrames);
 
-			return storyboard;
-		}
-	}
+            return storyboard;
+        }
+    }
 }

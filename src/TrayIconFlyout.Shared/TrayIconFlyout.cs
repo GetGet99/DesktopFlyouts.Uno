@@ -33,6 +33,9 @@ using Microsoft.UI.Xaml.Media.Animation;
 
 namespace U5BFA.Libraries
 {
+    /// <summary>
+    /// Displays a tray icon flyout hosted in a XAML island window.
+    /// </summary>
     [ContentProperty(Name = nameof(Islands))]
     public partial class TrayIconFlyout : Control, IDisposable
     {
@@ -63,6 +66,9 @@ namespace U5BFA.Libraries
         internal ContentBackdropManager? BackdropManager { get; private set; }
 #endif
 
+        /// <summary>
+        /// Initializes a new instance of <see cref="TrayIconFlyout"/>.
+        /// </summary>
         public TrayIconFlyout()
         {
             DefaultStyleKey = typeof(TrayIconFlyout);
@@ -73,6 +79,7 @@ namespace U5BFA.Libraries
             _host.WindowInactivated += HostWindow_Inactivated;
         }
 
+        /// <inheritdoc/>
         protected override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
@@ -99,6 +106,9 @@ namespace U5BFA.Libraries
             UpdateIslands();
         }
 
+        /// <summary>
+        /// Opens the flyout using its configured placement.
+        /// </summary>
         public void Show()
         {
             if (_disposed || _host?.DesktopWindowXamlSource is null || RootGrid is null || _isPopupAnimationPlaying)
@@ -164,6 +174,10 @@ namespace U5BFA.Libraries
             });
         }
 
+        /// <summary>
+        /// Opens the flyout at the specified bottom-center screen point.
+        /// </summary>
+        /// <param name="bottomCenterPoint">The bottom-center screen point for the flyout.</param>
         public void Show(Point bottomCenterPoint)
         {
             if (_isPopupAnimationPlaying)
@@ -173,6 +187,9 @@ namespace U5BFA.Libraries
             Show();
         }
 
+        /// <summary>
+        /// Closes the flyout.
+        /// </summary>
         public void Hide()
         {
             StopAutoCloseTimer();
@@ -197,6 +214,11 @@ namespace U5BFA.Libraries
         }
 
 #if UWP
+        /// <summary>
+        /// Lets the XAML island process a native keyboard message before dispatch.
+        /// </summary>
+        /// <param name="msg">The native message to process.</param>
+        /// <returns><see langword="true"/> if the message was handled; otherwise, <see langword="false"/>.</returns>
         public unsafe bool TryPreTranslateMessage(MSG* msg)
         {
             return _host?.TryPreTranslateMessage(msg) ?? false;
@@ -795,6 +817,7 @@ namespace U5BFA.Libraries
             if (HideOnLostFocus) Hide();
         }
 
+        /// <inheritdoc/>
         public void Dispose()
         {
             if (_disposed)

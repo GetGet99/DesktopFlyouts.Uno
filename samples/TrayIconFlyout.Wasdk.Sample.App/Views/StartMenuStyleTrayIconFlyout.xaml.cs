@@ -3,11 +3,11 @@
 
 namespace U5BFA.Libraries
 {
-	public sealed partial class StartMenuStyleTrayIconFlyout : TrayIconFlyout
-	{
-		public StartMenuStyleTrayIconFlyout()
-		{
-			InitializeComponent();
-		}
-	}
+    public sealed partial class StartMenuStyleTrayIconFlyout : TrayIconFlyout
+    {
+        public StartMenuStyleTrayIconFlyout()
+        {
+            InitializeComponent();
+        }
+    }
 }

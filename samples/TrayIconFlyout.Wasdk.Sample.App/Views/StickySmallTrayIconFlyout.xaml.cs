@@ -3,11 +3,11 @@
 
 namespace U5BFA.Libraries
 {
-	public sealed partial class StickySmallTrayIconFlyout : TrayIconFlyout
-	{
-		public StickySmallTrayIconFlyout()
-		{
-			InitializeComponent();
-		}
-	}
+    public sealed partial class StickySmallTrayIconFlyout : TrayIconFlyout
+    {
+        public StickySmallTrayIconFlyout()
+        {
+            InitializeComponent();
+        }
+    }
 }
