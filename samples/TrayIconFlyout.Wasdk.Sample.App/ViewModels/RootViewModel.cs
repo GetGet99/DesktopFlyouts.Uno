@@ -30,6 +30,9 @@ namespace U5BFA.Libraries
         internal partial bool HideOnLostFocus { get; set; }
 
         [ObservableProperty]
+        internal partial int SelectedActivationModeIndex { get; set; }
+
+        [ObservableProperty]
         internal partial double AutoCloseDelaySecondsValue { get; set; }
 
         [ObservableProperty]
@@ -52,6 +55,7 @@ namespace U5BFA.Libraries
 
         public Dictionary<TrayIconFlyoutPopupDirection, string> PopupDirections { get; private set; } = [];
         public Dictionary<FlyoutPlacementMode, string> FlyoutPlacements { get; private set; } = [];
+        public Dictionary<FlyoutActivationMode, string> ActivationModes { get; private set; } = [];
         public Dictionary<FlyoutSampleKinds, string> FlyoutExamples { get; private set; } = [];
         public Dictionary<BackdropKind, string> Backdrops { get; private set; } = [];
 
@@ -64,6 +68,11 @@ namespace U5BFA.Libraries
 
             IsBackdropEnabled = true;
             HideOnLostFocus = true;
+
+            ActivationModes.Add(FlyoutActivationMode.Activate, "Activate");
+            ActivationModes.Add(FlyoutActivationMode.NoActivateOnOpen, "No activate on open");
+            ActivationModes.Add(FlyoutActivationMode.NeverActivate, "Never activate");
+            SelectedActivationModeIndex = 0;
 
             FlyoutExamples.Add(FlyoutSampleKinds.DefaultStyle, "Default");
             FlyoutExamples.Add(FlyoutSampleKinds.StickySmallStyle, "Sticky small");
@@ -123,6 +132,12 @@ namespace U5BFA.Libraries
                 TrayIconManager.Default.TrayIconFlyout!.AutoCloseDelay = ToAutoCloseDelay(value);
         }
 
+        partial void OnSelectedActivationModeIndexChanged(int value)
+        {
+            if (IsDefaultFlyoutSelected())
+                TrayIconManager.Default.TrayIconFlyout!.ActivationMode = ActivationModes.ElementAt(value).Key;
+        }
+
         partial void OnSelectedPopupDirectionIndexChanged(int value)
         {
             if (IsDefaultFlyoutSelected())
@@ -179,6 +194,7 @@ namespace U5BFA.Libraries
             flyout.FlyoutHeight = ToGridLength(FlyoutHeightValue);
             flyout.FlyoutWidth = ToGridLength(FlyoutWidthValue);
             flyout.AutoCloseDelay = ToAutoCloseDelay(AutoCloseDelaySecondsValue);
+            flyout.ActivationMode = ActivationModes.ElementAt(SelectedActivationModeIndex).Key;
             flyout.HideOnLostFocus = HideOnLostFocus;
             flyout.IsBackdropEnabled = IsBackdropEnabled;
             flyout.Placement = FlyoutPlacements.ElementAt(SelectedFlyoutPlacementIndex).Key;

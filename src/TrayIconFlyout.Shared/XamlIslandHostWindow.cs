@@ -42,6 +42,7 @@ namespace U5BFA.Libraries
 
 		private HWND _xamlHwnd = default;
 		private bool _disposed;
+		private FlyoutActivationMode _activationMode = FlyoutActivationMode.Activate;
 
 #if UWP
 		private HWND _coreHwnd = default;
@@ -121,23 +122,25 @@ namespace U5BFA.Libraries
 			DesktopWindowXamlSource!.Content = content;
 		}
 
-		internal void MoveAndResize(RectInt32 rect)
+		internal void MoveAndResize(RectInt32 rect, bool activate = true)
 		{
 			if (_disposed)
 				return;
 
-			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, rect.X, rect.Y, rect.Width, rect.Height, 0U);
-			PInvoke.SetWindowPos(_xamlHwnd, HWND.HWND_TOP, 0, 0, rect.Width, rect.Height, 0U);
+			var flags = activate ? 0 : SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE;
+			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, rect.X, rect.Y, rect.Width, rect.Height, flags);
+			PInvoke.SetWindowPos(_xamlHwnd, HWND.HWND_TOP, 0, 0, rect.Width, rect.Height, flags);
 		}
 
-		internal void Maximize()
+		internal void Maximize(bool activate = true)
 		{
 			if (_disposed)
 				return;
 
+			var flags = activate ? 0 : SET_WINDOW_POS_FLAGS.SWP_NOACTIVATE;
 			var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
-			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, 0U);
-			PInvoke.SetWindowPos(_xamlHwnd, HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, 0U);
+			PInvoke.SetWindowPos(HWnd, HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, flags);
+			PInvoke.SetWindowPos(_xamlHwnd, HWND.HWND_TOP, 0, 0, bottomRightPoint.X, bottomRightPoint.Y, flags);
 		}
 
 		internal void SetHWndRectRegion(RectInt32 rect)
@@ -159,18 +162,33 @@ namespace U5BFA.Libraries
 				PInvoke.DeleteObject(region);
 		}
 
-		internal void UpdateWindowVisibility(bool isVisible)
+		internal void UpdateWindowVisibility(bool isVisible, bool activate = true)
 		{
 			if (_disposed)
 				return;
 
-			PInvoke.ShowWindow(HWnd, isVisible ? SHOW_WINDOW_CMD.SW_SHOW : SHOW_WINDOW_CMD.SW_HIDE);
+			var command = isVisible
+				? activate ? SHOW_WINDOW_CMD.SW_SHOW : SHOW_WINDOW_CMD.SW_SHOWNOACTIVATE
+				: SHOW_WINDOW_CMD.SW_HIDE;
+
+			PInvoke.ShowWindow(HWnd, command);
 
 #if UWP
-			PInvoke.ShowWindow(_xamlHwnd, isVisible ? SHOW_WINDOW_CMD.SW_SHOW : SHOW_WINDOW_CMD.SW_HIDE);
+			PInvoke.ShowWindow(_xamlHwnd, command);
 #else
 			if (isVisible) DesktopWindowXamlSource?.SiteBridge.Show(); else DesktopWindowXamlSource?.SiteBridge.Hide();
 #endif
+		}
+
+		internal void SetActivationMode(FlyoutActivationMode activationMode)
+		{
+			if (_disposed)
+				return;
+
+			_activationMode = activationMode;
+			var neverActivate = activationMode is FlyoutActivationMode.NeverActivate;
+			SetNoActivateStyle(HWnd, neverActivate);
+			SetNoActivateStyle(_xamlHwnd, neverActivate);
 		}
 
 #if UWP
@@ -187,6 +205,19 @@ namespace U5BFA.Libraries
 		internal void NavigateFocus()
 		{
 			DesktopWindowXamlSource?.NavigateFocus(new XamlSourceFocusNavigationRequest(XamlSourceFocusNavigationReason.First));
+		}
+
+		private static void SetNoActivateStyle(HWND hWnd, bool enabled)
+		{
+			if (hWnd.IsNull)
+				return;
+
+			var exStyle = (WINDOW_EX_STYLE)PInvoke.GetWindowLong(hWnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE);
+			exStyle = enabled
+				? exStyle | WINDOW_EX_STYLE.WS_EX_NOACTIVATE
+				: exStyle & ~WINDOW_EX_STYLE.WS_EX_NOACTIVATE;
+
+			PInvoke.SetWindowLong(hWnd, WINDOW_LONG_PTR_INDEX.GWL_EXSTYLE, (int)exStyle);
 		}
 
 		private void InitializeDesktopWindowXamlSource()
@@ -263,6 +294,9 @@ namespace U5BFA.Libraries
 					break;
 				case PInvoke.WM_SETFOCUS:
 					{
+						if (_activationMode is FlyoutActivationMode.NeverActivate)
+							break;
+
 						if (_xamlHwnd != default)
 							PInvoke.SetFocus(_xamlHwnd);
 					}
@@ -279,6 +313,13 @@ namespace U5BFA.Libraries
 							WindowInactivated?.Invoke(this, EventArgs.Empty);
 					}
 					break;
+				case PInvoke.WM_MOUSEACTIVATE:
+					{
+						if (_activationMode is FlyoutActivationMode.NeverActivate)
+							return (LRESULT)(int)PInvoke.MA_NOACTIVATE;
+
+						return PInvoke.DefWindowProc(hWnd, uMsg, wParam, lParam);
+					}
 				default:
 					{
 						return PInvoke.DefWindowProc(hWnd, uMsg, wParam, lParam);

@@ -74,6 +74,9 @@ namespace U5BFA.Libraries
 		[GeneratedDependencyProperty(DefaultValue = true)]
 		public partial bool HideOnLostFocus { get; set; }
 
+		[GeneratedDependencyProperty(DefaultValue = FlyoutActivationMode.Activate)]
+		public partial FlyoutActivationMode ActivationMode { get; set; }
+
 		public static readonly DependencyProperty AutoCloseDelayProperty =
 			DependencyProperty.Register(nameof(AutoCloseDelay), typeof(TimeSpan), typeof(TrayIconFlyout), new PropertyMetadata(TimeSpan.Zero, OnAutoCloseDelayPropertyChanged));
 
@@ -138,6 +141,14 @@ namespace U5BFA.Libraries
 #if WASDK
 			UpdateBackdropManager(true);
 #endif
+		}
+
+		partial void OnActivationModePropertyChanged(DependencyPropertyChangedEventArgs e)
+		{
+			if ((FlyoutActivationMode)e.NewValue == (FlyoutActivationMode)e.OldValue)
+				return;
+
+			_host?.SetActivationMode((FlyoutActivationMode)e.NewValue);
 		}
 	}
 }

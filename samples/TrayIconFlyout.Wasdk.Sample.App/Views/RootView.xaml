@@ -92,6 +92,13 @@
                 <wctcontrols:SettingsCard Header="Hide on losing focus">
                     <ToggleSwitch IsEnabled="{x:Bind ViewModel.IsModifiable, Mode=OneWay}" IsOn="{x:Bind ViewModel.HideOnLostFocus, Mode=TwoWay}" />
                 </wctcontrols:SettingsCard>
+                <wctcontrols:SettingsCard Header="Activation mode">
+                    <ComboBox
+                        Width="190"
+                        IsEnabled="{x:Bind ViewModel.IsModifiable, Mode=OneWay}"
+                        ItemsSource="{x:Bind ViewModel.ActivationModes.Values}"
+                        SelectedIndex="{x:Bind ViewModel.SelectedActivationModeIndex, Mode=TwoWay}" />
+                </wctcontrols:SettingsCard>
                 <wctcontrols:SettingsCard Header="Auto close delay">
                     <NumberBox
                         x:Name="AutoCloseDelayNumberBox"

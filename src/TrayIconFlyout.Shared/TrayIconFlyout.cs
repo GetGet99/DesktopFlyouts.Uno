@@ -91,7 +91,8 @@ namespace U5BFA.Libraries
 
             StopAutoCloseTimer();
             _isPopupAnimationPlaying = true;
-            _host.Maximize();
+            _host.SetActivationMode(ActivationMode);
+            _host.Maximize(ShouldActivateOnOpen());
 
             _ = Task.Run(async () =>
             {
@@ -121,7 +122,7 @@ namespace U5BFA.Libraries
                     UpdateLayout();
                     await Task.Delay(1);
 
-                    _host.UpdateWindowVisibility(true);
+                    _host.UpdateWindowVisibility(true, ShouldActivateOnOpen());
 
                     if (IsTransitionAnimationEnabled)
                     {
@@ -328,7 +329,7 @@ namespace U5BFA.Libraries
                 (int)regionWidth,
                 (int)regionHeight);
 
-            _host.MoveAndResize(region);
+            _host.MoveAndResize(region, ShouldActivateOnOpen());
             _host.SetHWndRectRegion(new(0, 0, region.Width, region.Height));
 
             return ResolvePopupDirection(requestedPopupDirection, region, hostWidth, hostHeight);
@@ -450,7 +451,8 @@ namespace U5BFA.Libraries
             SetOpenTransform();
             _isPopupAnimationPlaying = false;
             IsOpen = true;
-            _host?.NavigateFocus();
+            if (ShouldActivateOnOpen())
+                _host?.NavigateFocus();
             RestartAutoCloseTimer();
         }
 
@@ -618,6 +620,11 @@ namespace U5BFA.Libraries
         private static bool IsVerticalDirection(TrayIconFlyoutPopupDirection popupDirection)
         {
             return popupDirection is TrayIconFlyoutPopupDirection.BottomToTop or TrayIconFlyoutPopupDirection.TopToBottom;
+        }
+
+        private bool ShouldActivateOnOpen()
+        {
+            return ActivationMode is FlyoutActivationMode.Activate;
         }
 
         private static double Clamp(double value, double min, double max)

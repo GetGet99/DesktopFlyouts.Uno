@@ -12,6 +12,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\BackdropControllerHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\BackdropKind.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\ContentBackdropManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Helpers\FlyoutActivationMode.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\GeneralHelpers.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\IXamlSourceTransparency.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Helpers\ManualDefinitions.cs" />
