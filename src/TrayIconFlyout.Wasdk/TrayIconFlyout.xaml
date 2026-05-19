@@ -66,6 +66,8 @@
 
                         <Grid x:Name="PART_BackdropTargetGrid" CornerRadius="{TemplateBinding CornerRadius}" />
 
+                        <Border Background="{TemplateBinding Background}" />
+
                         <!--<SystemBackdropElement>
                             <SystemBackdropElement.SystemBackdrop>
                                 <MicaBackdrop />

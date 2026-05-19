@@ -53,6 +53,7 @@ namespace U5BFA.Libraries
                 FlyoutSampleKinds.StartMenuStyle => new StartMenuStyleFlyout(),
                 FlyoutSampleKinds.StickySmallStyle => new StickySmallFlyout(),
                 FlyoutSampleKinds.WidgetStyle => new WidgetStyleFlyout(),
+                FlyoutSampleKinds.Severity => new SeverityFlyout(),
                 _ => new CustomizableFlyout(),
             };
         }

@@ -80,6 +80,7 @@ namespace U5BFA.Libraries
             FlyoutExamples.Add(FlyoutSampleKinds.StartMenuStyle, "Start Menu");
             FlyoutExamples.Add(FlyoutSampleKinds.StickySmallStyle, "Sticky small");
             FlyoutExamples.Add(FlyoutSampleKinds.WidgetStyle, "Widget");
+            FlyoutExamples.Add(FlyoutSampleKinds.Severity, "Severity");
             SelectedFlyoutExampleIndex = 0;
 
             PopupDirections.Add(TrayIconFlyoutPopupDirection.Vertical, "Vertical");

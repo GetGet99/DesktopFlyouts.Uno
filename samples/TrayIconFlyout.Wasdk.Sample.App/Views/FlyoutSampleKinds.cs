@@ -19,5 +19,7 @@ namespace U5BFA.Libraries
         StickySmallStyle,
 
         WidgetStyle,
+
+        Severity,
     }
 }
