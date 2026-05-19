@@ -104,6 +104,8 @@ namespace U5BFA.Libraries
             FlyoutPlacements.Add(FlyoutPlacementMode.BottomLeft, "Bottom left");
             FlyoutPlacements.Add(FlyoutPlacementMode.BottomCenter, "Bottom center");
             FlyoutPlacements.Add(FlyoutPlacementMode.BottomRight, "Bottom right");
+            FlyoutPlacements.Add(FlyoutPlacementMode.LeftCenter, "Left center");
+            FlyoutPlacements.Add(FlyoutPlacementMode.RightCenter, "Right center");
             SelectedFlyoutPlacementIndex = 5;
 
             Backdrops.Add(BackdropKind.Acrylic, "Acrylic");

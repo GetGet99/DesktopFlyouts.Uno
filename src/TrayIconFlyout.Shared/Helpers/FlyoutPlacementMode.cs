@@ -37,5 +37,15 @@ namespace U5BFA.Libraries
         /// Places the flyout at the bottom-right corner of the work area.
         /// </summary>
         BottomRight,
+
+        /// <summary>
+        /// Places the flyout at the left center of the work area.
+        /// </summary>
+        LeftCenter,
+
+        /// <summary>
+        /// Places the flyout at the right center of the work area.
+        /// </summary>
+        RightCenter,
     }
 }

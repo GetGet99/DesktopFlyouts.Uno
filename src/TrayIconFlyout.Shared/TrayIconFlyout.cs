@@ -1205,6 +1205,8 @@ namespace U5BFA.Libraries
                 FlyoutPlacementMode.TopCenter => ((hostWidth - width) / 2, 0),
                 FlyoutPlacementMode.TopLeft => (0, 0),
                 FlyoutPlacementMode.TopRight => (hostWidth - width, 0),
+                FlyoutPlacementMode.LeftCenter => (0, (hostHeight - height) / 2),
+                FlyoutPlacementMode.RightCenter => (hostWidth - width, (hostHeight - height) / 2),
                 _ => (hostWidth - width, hostHeight - height),
             };
         }
