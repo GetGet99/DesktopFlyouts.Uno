@@ -134,7 +134,7 @@ namespace U5BFA.Libraries
                 cx: 0, cy: 0,
                 IMAGE_FLAGS.LR_LOADFROMFILE | IMAGE_FLAGS.LR_DEFAULTSIZE);
             if (hIcon.IsNull)
-                return;
+                throw new ArgumentOutOfRangeException(nameof(IconPath), $"LoadImage failed with 0x{Marshal.GetLastWin32Error():X8}");
 
             NOTIFYICONDATAW data = default;
             data.cbSize = (uint)sizeof(NOTIFYICONDATAW);
