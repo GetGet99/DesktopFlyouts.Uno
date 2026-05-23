@@ -1,5 +1,5 @@
-<h1 align="center">Tray Icon Flyout</h1>
-<p align="center">Empower your app with a flyout for its tray icon in WinUI 2/3.</p>
+<h1 align="center">DesktopFlyouts</h1>
+<p align="center">WinUI library for showing desktop flyouts from tray icons or programmatically.</p>
 
 https://github.com/user-attachments/assets/52f15ecf-6a91-491b-bf62-25294afc85d7
 
@@ -11,63 +11,63 @@ You can consume this project via NuGet. Use NuGet Package Manager or run the fol
 
 The UWP version of sample app is currently under development. Recommend to use WinUI 3
 
-<a style="text-decoration:none" href="https://www.nuget.org/packages/0x5BFA.TrayIconFlyout.Uwp"><img src="https://img.shields.io/nuget/v/0x5BFA.TrayIconFlyout.Uwp" alt="NuGet badge" /></a>
+<a style="text-decoration:none" href="https://www.nuget.org/packages/0x5BFA.DesktopFlyouts.Uwp"><img src="https://img.shields.io/nuget/v/0x5BFA.DesktopFlyouts.Uwp" alt="NuGet badge" /></a>
 
 ```console
-> dotnet add package 0x5BFA.TrayIconFlyout.Uwp --prerelease
+> dotnet add package 0x5BFA.DesktopFlyouts.Uwp --prerelease
 ```
 
 ### WinUI (WinAppSDK/WinUI3)
 
-<a style="text-decoration:none" href="https://www.nuget.org/packages/0x5BFA.TrayIconFlyout.WinUI"><img src="https://img.shields.io/nuget/v/0x5BFA.TrayIconFlyout.WinUI" alt="NuGet badge" /></a>
+<a style="text-decoration:none" href="https://www.nuget.org/packages/0x5BFA.DesktopFlyouts.WinUI"><img src="https://img.shields.io/nuget/v/0x5BFA.DesktopFlyouts.WinUI" alt="NuGet badge" /></a>
 
 ```console
-> dotnet add package 0x5BFA.TrayIconFlyout.WinUI --prerelease
+> dotnet add package 0x5BFA.DesktopFlyouts.WinUI --prerelease
 ```
 
 ## Usage
 
-There are two flyouts are available in this project. One is `TrayIconFlyout` for the Shell Flyout behavior, and the other is `TrayIconMenuFlyout` for the Context Menu behavior.
+This project provides `DesktopFlyout` for lightweight desktop panels and `DesktopMenuFlyout` for context menu behavior.
 
-### TrayIconFlyout
+### DesktopFlyout
 
 ```xml
-<me:TrayIconFlyout x:Class="..." ... Width="360">
+<me:DesktopFlyout x:Class="..." ... Width="360">
 
-    <me:TrayIconFlyoutIsland Height="300">
+    <me:DesktopFlyoutIsland Height="300">
         <!-- Put elements here -->
-    </me:TrayIconFlyoutIsland>
-    <me:TrayIconFlyoutIsland Height="300">
+    </me:DesktopFlyoutIsland>
+    <me:DesktopFlyoutIsland Height="300">
         <!-- Put elements here -->
-    </me:TrayIconFlyoutIsland>
+    </me:DesktopFlyoutIsland>
 
-</me:TrayIconFlyout>
+</me:DesktopFlyout>
 ```
 
 ```cs
-if (_trayIconFlyout.IsOpen)
-    _trayIconFlyout.Hide();
+if (_desktopFlyout.IsOpen)
+    _desktopFlyout.Hide();
 else
-    _trayIconFlyout.Show();
+    _desktopFlyout.Show();
 ```
 
-### TrayIconMeunFlyout
+### DesktopMenuFlyout
 
 ```xml
-<me:TrayIconMenuFlyout x:Class="..." ...>
+<me:DesktopMenuFlyout x:Class="..." ...>
 
     <MenuFlyoutItem Text="Theme" />
     <MenuFlyoutItem Text="Language" />
     <MenuFlyoutItem Text="Settings" />
 
-</me:TrayIconMenuFlyout>
+</me:DesktopMenuFlyout>
 ```
 
 ```cs
-if (_trayIconMenuFlyout.IsOpen)
-    _trayIconMenuFlyout.Hide();
+if (_desktopMenuFlyout.IsOpen)
+    _desktopMenuFlyout.Hide();
 
-_trayIconMenuFlyout.Show(e.Point);
+_desktopMenuFlyout.Show(e.Point);
 ```
 
 ## Building from the source
@@ -78,7 +78,7 @@ _trayIconMenuFlyout.Show(e.Point);
     - .NET 9/10 SDK
 2. Clone the repo
     ```console
-    git clone https://github.com/0x5bfa/TrayIconFlyout.git
+    git clone https://github.com/0x5bfa/DesktopFlyouts.git
     ```
 3. Open the solution
 4. Build the solution

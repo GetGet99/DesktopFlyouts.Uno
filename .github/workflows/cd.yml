@@ -1,15 +1,15 @@
 # Copyright (c) 0x5BFA. All rights reserved.
 # Licensed under the MIT license.
 
-name: TrayIconFlyout CD
+name: DesktopFlyouts CD
 
 on:
   workflow_dispatch:
 
 env:
-  WORKING_DIR:         '${{ github.workspace }}' # 'D:\a\TrayIconFlyout\TrayIconFlyout'
-  WASDK_APP_PROJ_PATH: '${{ github.workspace }}\src\TrayIconFlyout.Wasdk\TrayIconFlyout.Wasdk.csproj'
-  UWP_APP_PROJ_PATH:   '${{ github.workspace }}\src\TrayIconFlyout.Uwp\TrayIconFlyout.Uwp.csproj'
+  WORKING_DIR:         '${{ github.workspace }}' # 'D:\a\DesktopFlyouts\DesktopFlyouts'
+  WASDK_APP_PROJ_PATH: '${{ github.workspace }}\src\DesktopFlyouts.Wasdk\DesktopFlyouts.Wasdk.csproj'
+  UWP_APP_PROJ_PATH:   '${{ github.workspace }}\src\DesktopFlyouts.Uwp\DesktopFlyouts.Uwp.csproj'
   OUTPUT_DIR:          '${{ github.workspace }}\artifacts'
 
 jobs:

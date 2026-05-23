@@ -1,0 +1,64 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+
+		<TargetFrameworks>net9.0-windows10.0.26100;net10.0-windows10.0.26100</TargetFrameworks>
+		<Configurations>Debug;Release</Configurations>
+		<Platforms>x86;x64;arm64</Platforms>
+		<RootNamespace>U5BFA.Libraries</RootNamespace>
+		<Nullable>enable</Nullable>
+		<PublishAot>true</PublishAot>
+		<DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
+		<CsWin32RunAsBuildTask>true</CsWin32RunAsBuildTask>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>preview</LangVersion>
+		<NoWarn>$(NoWarn);CS8305;NU5104</NoWarn>
+		<DefineConstants>$(DefineConstants);WASDK</DefineConstants>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+
+		<UseWinUI>true</UseWinUI>
+		<WinUISDKReferences>false</WinUISDKReferences>
+		<RuntimeIdentifiers>win-x86;win-x64;win-arm64</RuntimeIdentifiers>
+
+		<CsWinRTIncludes>Microsoft.UI.Content.ContentExternalBackdropLink;Microsoft.UI.Content.IContentExternalBackdropLink</CsWinRTIncludes>
+
+		<Deterministic>true</Deterministic>
+		<ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<DebugType>portable</DebugType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<EmbedUntrackedSources>true</EmbedUntrackedSources>
+		<PackageId>0x5BFA.DesktopFlyouts.WinUI</PackageId>
+		<Title>0x5BFA.DesktopFlyouts.WinUI</Title>
+		<Authors>0x5BFA</Authors>
+		<Version>1.1.0</Version>
+		<Description>WinUI library for showing desktop flyouts from tray icons or programmatically.</Description>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/0x5bfa/DesktopFlyouts</RepositoryUrl>
+		<PackageTags>Shell System TrayIcon DesktopFlyouts DesktopFlyout UWP WinUI MUX WASDK WindowsAppSDK Windows</PackageTags>
+		<PackageIcon>icon-128.png</PackageIcon>
+
+	</PropertyGroup>
+
+	<ItemGroup>
+		<CsWinRTInputs Include="Microsoft.UI.winmd" /> <!--  Extracted from the WASDK 1.8 MSIX package installation  -->
+		<None Include="..\..\.nuget\README.md" Pack="true" PackagePath="" />
+		<None Include="..\..\LICENSE" Pack="true" PackagePath="" />
+		<None Include="..\..\.nuget\icon-128.png" Pack="true" PackagePath="" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Labs.WinUI.DependencyPropertyGenerator" Version="0.1.250206-build.2040" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="10.0.300" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.1839" />
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.0.1" />
+		<PackageReference Include="Microsoft.Windows.CsWinRT" Version="2.2.0" />
+		<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.3.275" PrivateAssets="all" />
+	</ItemGroup>
+
+	<Import Project="..\DesktopFlyouts.Shared\DesktopFlyouts.Shared.projitems" Label="Shared" />
+
+</Project>

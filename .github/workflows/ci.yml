@@ -1,7 +1,7 @@
 # Copyright (c) 0x5BFA. All rights reserved.
 # Licensed under the MIT license.
 
-name: TrayIconFlyout CI
+name: DesktopFlyouts CI
 
 on:
   push:
@@ -17,13 +17,13 @@ on:
       - 'docs/**'
       - '*.md'
 
-run-name: ${{ github.event_name == 'pull_request' && 'TrayIconFlyout PR Validation' || 'TrayIconFlyout CI Validation' }}
+run-name: ${{ github.event_name == 'pull_request' && 'DesktopFlyouts PR Validation' || 'DesktopFlyouts CI Validation' }}
 
 env:
-  WORKING_DIR:           '${{ github.workspace }}' # 'D:\a\TrayIconFlyout\TrayIconFlyout'
-  SOLUTION_PATH:         '${{ github.workspace }}\TrayIconFlyout.slnx'
-  WASDK_APP_PROJ_PATH:   '${{ github.workspace }}\samples\TrayIconFlyout.Wasdk.Sample.App\TrayIconFlyout.Wasdk.Sample.App.csproj'
-  UWP_APP_PROJ_PATH:     '${{ github.workspace }}\samples\TrayIconFlyout.Uwp.Sample.App\TrayIconFlyout.Uwp.Sample.App.csproj'
+  WORKING_DIR:           '${{ github.workspace }}' # 'D:\a\DesktopFlyouts\DesktopFlyouts'
+  SOLUTION_PATH:         '${{ github.workspace }}\DesktopFlyouts.slnx'
+  WASDK_APP_PROJ_PATH:   '${{ github.workspace }}\samples\DesktopFlyouts.Wasdk.Sample.App\DesktopFlyouts.Wasdk.Sample.App.csproj'
+  UWP_APP_PROJ_PATH:     '${{ github.workspace }}\samples\DesktopFlyouts.Uwp.Sample.App\DesktopFlyouts.Uwp.Sample.App.csproj'
 
 jobs:
   build-wasdk:

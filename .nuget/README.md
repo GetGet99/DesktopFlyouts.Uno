@@ -1,31 +1,31 @@
 ## Usage
 
-### TrayIconFlyout
+### DesktopFlyout
 
 ```xml
-<me:TrayIconFlyout x:Class="..." ... Width="360">
+<me:DesktopFlyout x:Class="..." ... Width="360">
 
-    <me:TrayIconFlyoutIsland Height="300">
+    <me:DesktopFlyoutIsland Height="300">
         <!-- Put elements here -->
-    </me:TrayIconFlyoutIsland>
-    <me:TrayIconFlyoutIsland Height="300">
+    </me:DesktopFlyoutIsland>
+    <me:DesktopFlyoutIsland Height="300">
         <!-- Put elements here -->
-    </me:TrayIconFlyoutIsland>
+    </me:DesktopFlyoutIsland>
 
-</me:TrayIconFlyout>
+</me:DesktopFlyout>
 ```
 
 ```cs
-if (_trayIconFlyout.IsOpen)
-    _trayIconFlyout.Hide();
+if (_desktopFlyout.IsOpen)
+    _desktopFlyout.Hide();
 else
-    _trayIconFlyout.Show();
+    _desktopFlyout.Show();
 ```
 
-### TrayIconMeunFlyout
+### DesktopMenuFlyout
 
 ```xml
-<me:TrayIconMenuFlyout x:Class="..." ...>
+<me:DesktopMenuFlyout x:Class="..." ...>
 
     <MenuFlyoutSubItem Text="Settings">
         <MenuFlyoutSubItem.Icon>
@@ -44,19 +44,19 @@ else
         </MenuFlyoutItem.Icon>
     </MenuFlyoutItem>
 
-</me:TrayIconMenuFlyout>
+</me:DesktopMenuFlyout>
 ```
 
 ```cs
-if (_trayIconMenuFlyout.IsOpen)
-    _trayIconMenuFlyout.Hide();
+if (_desktopMenuFlyout.IsOpen)
+    _desktopMenuFlyout.Hide();
 
-_trayIconMenuFlyout.Show(e.Point);
+_desktopMenuFlyout.Show(e.Point);
 ```
 
 ## Screenshots
 
-Visit the repo's README: https://github.com/0x5bfa/TrayIconFlyout
+Visit the repo's README: https://github.com/0x5bfa/DesktopFlyouts
 
 ## License
 

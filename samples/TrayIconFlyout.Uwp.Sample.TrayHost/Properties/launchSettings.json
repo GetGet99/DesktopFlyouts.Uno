@@ -1,7 +1,0 @@
-{
-  "profiles": {
-    "TrayIconFlyout.Uwp.Sample.TrayHost": {
-      "commandName": "MsixPackage"
-    }
-  }
-}
