@@ -36,8 +36,15 @@ using Microsoft.UI.Xaml.Media.Animation;
 namespace U5BFA.Libraries
 {
     /// <summary>
-    /// Displays a desktop flyout hosted in a XAML island window.
+    /// Displays a desktop flyout in an independent XAML island window.
     /// </summary>
+    /// <remarks>
+    /// Use <see cref="DesktopFlyout"/> when you need a lightweight desktop surface that can be opened
+    /// from a tray icon or from application code. Add one or more <see cref="DesktopFlyoutIsland"/>
+    /// instances to define the visible sections, then call <see cref="Show()"/> or the point-based
+    /// overload to display the flyout. Dispose the instance when it is no longer used
+    /// so the underlying host window and XAML island can be released.
+    /// </remarks>
     [ContentProperty(Name = nameof(Islands))]
     public partial class DesktopFlyout : Control, IDisposable
     {
@@ -81,6 +88,9 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Initializes a new instance of <see cref="DesktopFlyout"/>.
         /// </summary>
+        /// <remarks>
+        /// The constructor creates the hidden desktop host window used to display the flyout.
+        /// </remarks>
         public DesktopFlyout()
         {
             DefaultStyleKey = typeof(DesktopFlyout);
@@ -135,6 +145,12 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Opens the flyout using its configured placement.
         /// </summary>
+        /// <remarks>
+        /// The flyout is positioned from <see cref="Placement"/> and animated from the direction
+        /// resolved by <see cref="PopupDirection"/>. Calls made while an open or close transition is
+        /// running are ignored. <see cref="IsOpen"/> becomes <see langword="true"/> after the open
+        /// transition completes.
+        /// </remarks>
         public void Show()
         {
             if (_disposed || _host?.DesktopWindowXamlSource is null || RootGrid is null || _isPopupAnimationPlaying)
@@ -203,7 +219,12 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Opens the flyout at the specified bottom-center screen point.
         /// </summary>
-        /// <param name="bottomCenterPoint">The bottom-center screen point for the flyout.</param>
+        /// <param name="bottomCenterPoint">The desired bottom-center point of the flyout in physical screen pixels.</param>
+        /// <remarks>
+        /// This overload is useful when opening from a tray icon or another screen-space target.
+        /// The requested point is used for this open operation only; later calls to <see cref="Show()"/>
+        /// return to the configured <see cref="Placement"/>.
+        /// </remarks>
         public void Show(Point bottomCenterPoint)
         {
             if (_isPopupAnimationPlaying)
@@ -216,6 +237,10 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Closes the flyout.
         /// </summary>
+        /// <remarks>
+        /// Calls made while an open or close transition is running are ignored. <see cref="IsOpen"/>
+        /// becomes <see langword="false"/> after the close transition completes.
+        /// </remarks>
         public void Hide()
         {
             Hide(false);
@@ -251,6 +276,10 @@ namespace U5BFA.Libraries
         /// Moves focus into the flyout's XAML island.
         /// </summary>
         /// <param name="reason">The focus navigation reason used by the XAML hosting layer.</param>
+        /// <remarks>
+        /// Focus cannot be moved into the flyout while <see cref="ActivationMode"/> is
+        /// <see cref="FlyoutActivationMode.NeverActivate"/>.
+        /// </remarks>
         public void NavigateFocus(XamlSourceFocusNavigationReason reason = XamlSourceFocusNavigationReason.Programmatic)
         {
             _host?.NavigateFocus(reason);
@@ -262,6 +291,10 @@ namespace U5BFA.Libraries
         /// </summary>
         /// <param name="msg">The native message to process.</param>
         /// <returns><see langword="true"/> if the message was handled; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// UWP desktop-host scenarios should call this from their native message loop so keyboard
+        /// navigation and accelerator processing can reach the hosted XAML island.
+        /// </remarks>
         public unsafe bool TryPreTranslateMessage(MSG* msg)
         {
             return _host?.TryPreTranslateMessage(msg) ?? false;

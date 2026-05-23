@@ -6,6 +6,10 @@ namespace U5BFA.Libraries
     /// <summary>
     /// Specifies where a desktop flyout is placed in the work area.
     /// </summary>
+    /// <remarks>
+    /// Placement is used by <see cref="DesktopFlyout.Show()"/>. It is bypassed for the single open
+    /// operation started by the point-based show overload.
+    /// </remarks>
     public enum FlyoutPlacementMode
     {
         /// <summary>

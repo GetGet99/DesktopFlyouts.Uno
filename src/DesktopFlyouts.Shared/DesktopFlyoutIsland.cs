@@ -18,6 +18,11 @@ namespace U5BFA.Libraries
     /// <summary>
     /// Represents a content section inside a <see cref="DesktopFlyout"/>.
     /// </summary>
+    /// <remarks>
+    /// Islands are arranged by their owner flyout according to
+    /// <see cref="DesktopFlyout.IslandsOrientation"/>. Put the XAML content for one visual section
+    /// in each island.
+    /// </remarks>
     public partial class DesktopFlyoutIsland : ContentControl
     {
         private const string PART_RootGrid = "PART_RootGrid";
@@ -49,6 +54,7 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Gets or sets the island width.
         /// </summary>
+        /// <value>The width used when the owner flyout arranges islands horizontally. The default is <see cref="GridLength.Auto"/>.</value>
         public GridLength IslandWidth
         {
             get => (GridLength)GetValue(IslandWidthProperty);
@@ -64,6 +70,7 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Gets or sets the island height.
         /// </summary>
+        /// <value>The height used when the owner flyout arranges islands vertically. The default is <see cref="GridLength.Auto"/>.</value>
         public GridLength IslandHeight
         {
             get => (GridLength)GetValue(IslandHeightProperty);
@@ -73,6 +80,9 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Initializes a new instance of <see cref="DesktopFlyoutIsland"/>.
         /// </summary>
+        /// <remarks>
+        /// The island applies its default style when it is loaded by the owning XAML framework.
+        /// </remarks>
         public DesktopFlyoutIsland()
         {
             DefaultStyleKey = typeof(DesktopFlyoutIsland);

@@ -15,6 +15,12 @@ namespace U5BFA.Libraries
     /// <summary>
     /// Provides functionality for displaying and managing a system tray icon in the taskbar.
     /// </summary>
+    /// <remarks>
+    /// <see cref="SystemTrayIcon"/> wraps the Win32 notification icon APIs and raises click events
+    /// with screen coordinates that can be passed to the point-based flyout and menu show methods.
+    /// Call <see cref="Destroy"/> when the icon should
+    /// be removed.
+    /// </remarks>
     public unsafe class SystemTrayIcon
     {
         private const uint WM_UNIQUE_MESSAGE = 2048U;
@@ -33,6 +39,10 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Gets or sets the path to the icon file.
         /// </summary>
+        /// <value>The path to an icon file loaded with the Win32 <c>LoadImage</c> API.</value>
+        /// <remarks>
+        /// Setting this property updates the existing tray icon immediately.
+        /// </remarks>
         public string IconPath
         {
             get => _IconPath;
@@ -48,6 +58,10 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Gets or sets the tooltip text shown for the tray icon.
         /// </summary>
+        /// <value>The tray icon tooltip text. Text longer than the shell limit is truncated.</value>
+        /// <remarks>
+        /// Setting this property updates the existing tray icon immediately.
+        /// </remarks>
         public string Tooltip
         {
             get => _Tooltip;
@@ -63,6 +77,10 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Gets or sets whether the tray icon is visible.
         /// </summary>
+        /// <value><see langword="true"/> to show the tray icon; otherwise, <see langword="false"/>.</value>
+        /// <remarks>
+        /// Setting this property updates the existing tray icon immediately.
+        /// </remarks>
         public bool IsVisible
         {
             get => _IsVisible;
@@ -76,21 +94,32 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Gets the stable identifier used for the tray icon.
         /// </summary>
+        /// <value>The GUID used by the shell to identify this notification icon.</value>
         public Guid Id { get; }
 
         /// <summary>
         /// Occurs when the tray icon window is destroyed.
         /// </summary>
+        /// <remarks>
+        /// The event is raised after <see cref="Destroy"/> has been called from the hidden tray icon
+        /// window's destroy message.
+        /// </remarks>
         public event EventHandler? IconDestroyed;
 
         /// <summary>
         /// Occurs when the tray icon receives a left-click.
         /// </summary>
+        /// <remarks>
+        /// The event argument contains the center point of the tray icon in physical screen pixels.
+        /// </remarks>
         public event EventHandler<MouseEventReceivedEventArgs>? LeftClicked;
 
         /// <summary>
         /// Occurs when the tray icon receives a right-click.
         /// </summary>
+        /// <remarks>
+        /// The event argument contains the center point of the tray icon in physical screen pixels.
+        /// </remarks>
         public event EventHandler<MouseEventReceivedEventArgs>? RightClicked;
 
         /// <summary>
@@ -100,6 +129,10 @@ namespace U5BFA.Libraries
         /// <param name="tooltip">The tooltip text.</param>
         /// <param name="id">The stable identifier for the tray icon.</param>
         /// <param name="isVisible">Whether the tray icon is initially visible.</param>
+        /// <remarks>
+        /// Construction creates the hidden window that receives notification icon callbacks. Call
+        /// <see cref="Show"/> to add the icon to the shell notification area.
+        /// </remarks>
         public SystemTrayIcon(string iconPath, string tooltip, Guid id, bool isVisible = true)
         {
             _taskbarRestartMessageId = PInvoke.RegisterWindowMessage((PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in "TaskbarCreated".GetPinnableReference())));
@@ -125,6 +158,9 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Displays the notification icon in the system tray, creating it if necessary or updating its appearance and tooltip if it already exists.
         /// </summary>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <see cref="IconPath"/> cannot be loaded as an icon file.
+        /// </exception>
         public void Show()
         {
             HICON hIcon = (HICON)(void*)PInvoke.LoadImage(
@@ -194,6 +230,9 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Removes the associated notification icon from the system tray.
         /// </summary>
+        /// <remarks>
+        /// This method is safe to call multiple times.
+        /// </remarks>
         public void Destroy()
         {
             if (_created)

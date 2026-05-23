@@ -12,7 +12,7 @@
 		<CsWin32RunAsBuildTask>true</CsWin32RunAsBuildTask>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>preview</LangVersion>
-		<NoWarn>$(NoWarn);CS8305;NU5104</NoWarn>
+		<NoWarn>$(NoWarn);CS8305;NU5104;CS1591</NoWarn>
 		<DefineConstants>$(DefineConstants);UWP</DefineConstants>
 		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
@@ -25,6 +25,7 @@
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 		<DebugType>portable</DebugType>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<EmbedUntrackedSources>true</EmbedUntrackedSources>
 		<PackageId>0x5BFA.DesktopFlyouts.Uwp</PackageId>

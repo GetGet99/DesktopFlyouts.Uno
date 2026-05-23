@@ -20,8 +20,13 @@ using Microsoft.UI.Xaml.Markup;
 namespace U5BFA.Libraries
 {
     /// <summary>
-    /// Displays a desktop menu flyout hosted in a XAML island window.
+    /// Displays a menu flyout in an independent XAML island window.
     /// </summary>
+    /// <remarks>
+    /// Use <see cref="DesktopMenuFlyout"/> when a context menu must be opened at a physical screen
+    /// point, such as a tray icon click. Add <see cref="MenuFlyoutItemBase"/> items as children and
+    /// call the point-based show overload to display the menu.
+    /// </remarks>
     [ContentProperty(Name = nameof(Items))]
     public partial class DesktopMenuFlyout : ItemsControl, IDisposable
     {
@@ -37,12 +42,16 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Identifies the <see cref="IsOpen"/> dependency property.
         /// </summary>
+        /// <remarks>
+        /// The property is read-only to consumers and is updated when the hosted menu opens or closes.
+        /// </remarks>
         public static readonly DependencyProperty IsOpenProperty =
             DependencyProperty.Register(nameof(IsOpen), typeof(bool), typeof(DesktopMenuFlyout), new PropertyMetadata(false));
 
         /// <summary>
         /// Gets whether the menu flyout is currently open.
         /// </summary>
+        /// <value><see langword="true"/> while the hosted menu is open; otherwise, <see langword="false"/>.</value>
         public bool IsOpen
         {
             get => (bool)GetValue(IsOpenProperty);
@@ -52,6 +61,9 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Initializes a new instance of <see cref="DesktopMenuFlyout"/>.
         /// </summary>
+        /// <remarks>
+        /// The constructor creates the hidden desktop host window used to display the menu.
+        /// </remarks>
         public DesktopMenuFlyout()
         {
             DefaultStyleKey = typeof(DesktopMenuFlyout);
@@ -95,7 +107,11 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Opens the menu flyout at the specified screen point.
         /// </summary>
-        /// <param name="point">The screen point used to position the menu.</param>
+        /// <param name="point">The physical screen pixel where the menu host should be positioned.</param>
+        /// <remarks>
+        /// The menu is built from the current <see cref="ItemsControl.Items"/> collection. Items must
+        /// derive from <see cref="MenuFlyoutItemBase"/>.
+        /// </remarks>
         public void Show(Point point)
         {
             if (_disposed || _menuFlyout is null)
@@ -115,6 +131,9 @@ namespace U5BFA.Libraries
         /// <summary>
         /// Closes the menu flyout.
         /// </summary>
+        /// <remarks>
+        /// This also hides the desktop host window.
+        /// </remarks>
         public void Hide()
         {
             if (_disposed)
@@ -139,6 +158,10 @@ namespace U5BFA.Libraries
         /// </summary>
         /// <param name="msg">The native message to process.</param>
         /// <returns><see langword="true"/> if the message was handled; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>
+        /// UWP desktop-host scenarios should call this from their native message loop so keyboard
+        /// navigation and accelerator processing can reach the hosted XAML island.
+        /// </remarks>
         public unsafe bool TryPreTranslateMessage(MSG* msg)
         {
             return _host?.TryPreTranslateMessage(msg) ?? false;

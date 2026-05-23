@@ -1,14 +1,19 @@
+DesktopFlyouts is a WinUI library for showing desktop flyouts from tray icons or programmatically.
+
 ## Usage
 
 ### DesktopFlyout
 
 ```xml
-<me:DesktopFlyout x:Class="..." ... Width="360">
+<me:DesktopFlyout
+    x:Class="..."
+    xmlns:me="using:U5BFA.Libraries"
+    FlyoutWidth="360">
 
-    <me:DesktopFlyoutIsland Height="300">
+    <me:DesktopFlyoutIsland IslandHeight="300">
         <!-- Put elements here -->
     </me:DesktopFlyoutIsland>
-    <me:DesktopFlyoutIsland Height="300">
+    <me:DesktopFlyoutIsland IslandHeight="300">
         <!-- Put elements here -->
     </me:DesktopFlyoutIsland>
 
@@ -25,7 +30,9 @@ else
 ### DesktopMenuFlyout
 
 ```xml
-<me:DesktopMenuFlyout x:Class="..." ...>
+<me:DesktopMenuFlyout
+    x:Class="..."
+    xmlns:me="using:U5BFA.Libraries">
 
     <MenuFlyoutSubItem Text="Settings">
         <MenuFlyoutSubItem.Icon>
@@ -54,9 +61,13 @@ if (_desktopMenuFlyout.IsOpen)
 _desktopMenuFlyout.Show(e.Point);
 ```
 
-## Screenshots
+## Documentation
 
-Visit the repo's README: https://github.com/0x5bfa/DesktopFlyouts
+- Getting started: https://github.com/0x5bfa/DesktopFlyouts/blob/main/docs/getting-started.md
+- DesktopFlyout: https://github.com/0x5bfa/DesktopFlyouts/blob/main/docs/desktop-flyout.md
+- DesktopMenuFlyout: https://github.com/0x5bfa/DesktopFlyouts/blob/main/docs/desktop-menu-flyout.md
+- SystemTrayIcon: https://github.com/0x5bfa/DesktopFlyouts/blob/main/docs/system-tray-icon.md
+- Focus and activation: https://github.com/0x5bfa/DesktopFlyouts/blob/main/docs/focus-and-activation.md
 
 ## License
 

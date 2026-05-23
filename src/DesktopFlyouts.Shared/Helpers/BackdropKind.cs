@@ -6,6 +6,10 @@ namespace U5BFA.Libraries
     /// <summary>
     /// Specifies the system backdrop used by a flyout.
     /// </summary>
+    /// <remarks>
+    /// This setting affects Windows App SDK builds when
+    /// <see cref="DesktopFlyout.IsBackdropEnabled"/> is enabled.
+    /// </remarks>
     public enum BackdropKind
     {
         /// <summary>

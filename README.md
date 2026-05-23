@@ -1,4 +1,4 @@
-<h1 align="center">DesktopFlyouts</h1>
+<h1 align="center">Desktop Flyouts</h1>
 <p align="center">WinUI library for showing desktop flyouts from tray icons or programmatically.</p>
 
 https://github.com/user-attachments/assets/52f15ecf-6a91-491b-bf62-25294afc85d7
@@ -25,6 +25,14 @@ The UWP version of sample app is currently under development. Recommend to use W
 > dotnet add package 0x5BFA.DesktopFlyouts.WinUI --prerelease
 ```
 
+## Documentation
+
+- [Getting started](docs/getting-started.md)
+- [DesktopFlyout](docs/desktop-flyout.md)
+- [DesktopMenuFlyout](docs/desktop-menu-flyout.md)
+- [SystemTrayIcon](docs/system-tray-icon.md)
+- [Focus and activation](docs/focus-and-activation.md)
+
 ## Usage
 
 This project provides `DesktopFlyout` for lightweight desktop panels and `DesktopMenuFlyout` for context menu behavior.
@@ -32,12 +40,15 @@ This project provides `DesktopFlyout` for lightweight desktop panels and `Deskto
 ### DesktopFlyout
 
 ```xml
-<me:DesktopFlyout x:Class="..." ... Width="360">
+<me:DesktopFlyout
+    x:Class="..."
+    xmlns:me="using:U5BFA.Libraries"
+    FlyoutWidth="360">
 
-    <me:DesktopFlyoutIsland Height="300">
+    <me:DesktopFlyoutIsland IslandHeight="300">
         <!-- Put elements here -->
     </me:DesktopFlyoutIsland>
-    <me:DesktopFlyoutIsland Height="300">
+    <me:DesktopFlyoutIsland IslandHeight="300">
         <!-- Put elements here -->
     </me:DesktopFlyoutIsland>
 
@@ -54,7 +65,9 @@ else
 ### DesktopMenuFlyout
 
 ```xml
-<me:DesktopMenuFlyout x:Class="..." ...>
+<me:DesktopMenuFlyout
+    x:Class="..."
+    xmlns:me="using:U5BFA.Libraries">
 
     <MenuFlyoutItem Text="Theme" />
     <MenuFlyoutItem Text="Language" />
