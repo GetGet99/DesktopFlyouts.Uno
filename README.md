@@ -11,18 +11,18 @@ You can consume this project via NuGet. Use NuGet Package Manager or run the fol
 
 The UWP version of sample app is currently under development. Recommend to use WinUI 3
 
-<a style="text-decoration:none" href="https://www.nuget.org/packages/0x5BFA.DesktopFlyouts.Uwp"><img src="https://img.shields.io/nuget/v/0x5BFA.DesktopFlyouts.Uwp" alt="NuGet badge" /></a>
+<a style="text-decoration:none" href="https://www.nuget.org/packages/DesktopFlyouts.Uwp"><img src="https://img.shields.io/nuget/v/DesktopFlyouts.Uwp" alt="NuGet badge" /></a>
 
 ```console
-> dotnet add package 0x5BFA.DesktopFlyouts.Uwp --prerelease
+> dotnet add package DesktopFlyouts.Uwp --prerelease
 ```
 
 ### WinUI (WinAppSDK/WinUI3)
 
-<a style="text-decoration:none" href="https://www.nuget.org/packages/0x5BFA.DesktopFlyouts.WinUI"><img src="https://img.shields.io/nuget/v/0x5BFA.DesktopFlyouts.WinUI" alt="NuGet badge" /></a>
+<a style="text-decoration:none" href="https://www.nuget.org/packages/DesktopFlyouts.WinUI"><img src="https://img.shields.io/nuget/v/DesktopFlyouts.WinUI" alt="NuGet badge" /></a>
 
 ```console
-> dotnet add package 0x5BFA.DesktopFlyouts.WinUI --prerelease
+> dotnet add package DesktopFlyouts.WinUI --prerelease
 ```
 
 ## Documentation
