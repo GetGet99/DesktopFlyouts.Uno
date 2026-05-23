@@ -368,8 +368,7 @@ namespace U5BFA.Libraries
             var scaledMargin = GetScaledMargin(Margin, scale);
             var frameWidth = (flyoutWidth + Margin.Left + Margin.Right) * scale;
             var frameHeight = (flyoutHeight + Margin.Top + Margin.Bottom) * scale;
-            var hostWidth = _host.WindowSize.Width;
-            var hostHeight = _host.WindowSize.Height;
+            var (hostWidth, hostHeight) = GetWorkAreaSizeInPixels();
             var regionWidth = Math.Max(1, (int)Math.Ceiling(Math.Min(frameWidth, hostWidth)));
             var regionHeight = Math.Max(1, (int)Math.Ceiling(Math.Min(frameHeight, hostHeight)));
             var customBottomCenterPoint = _customPlacementBottomCenterPoint;
@@ -448,11 +447,18 @@ namespace U5BFA.Libraries
                 return (0, 0);
 
             var scale = _host.XamlIslandRasterizationScale;
-            var hostSize = _host.WindowSize;
-            var availableWidth = (hostSize.Width / scale) - Margin.Left - Margin.Right;
-            var availableHeight = (hostSize.Height / scale) - Margin.Top - Margin.Bottom;
+            var (workAreaWidth, workAreaHeight) = GetWorkAreaSizeInPixels();
+            var availableWidth = (workAreaWidth / scale) - Margin.Left - Margin.Right;
+            var availableHeight = (workAreaHeight / scale) - Margin.Top - Margin.Bottom;
 
             return (Math.Max(0, availableWidth), Math.Max(0, availableHeight));
+        }
+
+        private static (double Width, double Height) GetWorkAreaSizeInPixels()
+        {
+            var bottomRightPoint = WindowHelpers.GetBottomRightCornerPoint();
+
+            return (Math.Max(0, bottomRightPoint.X), Math.Max(0, bottomRightPoint.Y));
         }
 
         private bool HasStarIslandWidth()
