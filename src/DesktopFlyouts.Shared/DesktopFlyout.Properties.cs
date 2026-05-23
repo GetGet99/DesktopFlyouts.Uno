@@ -261,10 +261,7 @@ namespace U5BFA.Libraries
             if (ReferenceEquals(e.NewValue, e.OldValue))
                 return;
 
-#if WASDK
-            foreach (var island in Islands)
-                island.UpdateOwnerBackdrop();
-#endif
+            UpdateIslandBackdrops();
         }
 
         partial void OnBackdropKindPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -272,10 +269,7 @@ namespace U5BFA.Libraries
             if ((DesktopFlyoutBackdropKind)e.NewValue == (DesktopFlyoutBackdropKind)e.OldValue)
                 return;
 
-#if WASDK
-            foreach (var island in Islands)
-                island.UpdateOwnerBackdrop();
-#endif
+            UpdateIslandBackdrops();
         }
 
         partial void OnActivationModePropertyChanged(DependencyPropertyChangedEventArgs e)

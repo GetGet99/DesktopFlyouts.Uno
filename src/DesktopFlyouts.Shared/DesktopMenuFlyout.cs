@@ -58,6 +58,7 @@ namespace U5BFA.Libraries
             _host = new XamlIslandHostWindow();
             _host.SetContent(this);
             _host.UpdateWindowVisibility(false);
+            _host.SystemSettingsChanged += HostWindow_SystemSettingsChanged;
         }
 
         /// <inheritdoc/>
@@ -137,6 +138,14 @@ namespace U5BFA.Libraries
             IsOpen = false;
         }
 
+        private void HostWindow_SystemSettingsChanged(object? sender, EventArgs e)
+        {
+            if (_disposed)
+                return;
+
+            UpdateFlyoutTheme();
+        }
+
 #if UWP
         /// <summary>
         /// Lets the XAML island process a native keyboard message before dispatch.
@@ -176,6 +185,7 @@ namespace U5BFA.Libraries
                 _menuFlyout = null;
             }
 
+            _host?.SystemSettingsChanged -= HostWindow_SystemSettingsChanged;
             _host?.Dispose();
             IsOpen = false;
 

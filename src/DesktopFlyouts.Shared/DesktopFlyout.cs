@@ -85,6 +85,7 @@ namespace U5BFA.Libraries
             _host.SetContent(this);
             _host.UpdateWindowVisibility(false);
             _host.WindowInactivated += HostWindow_Inactivated;
+            _host.SystemSettingsChanged += HostWindow_SystemSettingsChanged;
         }
 
         /// <inheritdoc/>
@@ -306,6 +307,14 @@ namespace U5BFA.Libraries
                 foreach (var island in Islands)
                     island.RequestedTheme = ElementTheme.Dark;
             }
+        }
+
+        private void UpdateIslandBackdrops()
+        {
+#if WASDK
+            foreach (var island in Islands)
+                island.UpdateOwnerBackdrop();
+#endif
         }
 
         private void UpdateIslands()
@@ -1204,6 +1213,15 @@ namespace U5BFA.Libraries
             if (HideOnLostFocus) Hide();
         }
 
+        private void HostWindow_SystemSettingsChanged(object? sender, EventArgs e)
+        {
+            if (_disposed)
+                return;
+
+            UpdateFlyoutTheme();
+            UpdateIslandBackdrops();
+        }
+
         /// <inheritdoc/>
         public void Dispose()
         {
@@ -1216,6 +1234,7 @@ namespace U5BFA.Libraries
             RestoreFocusSuppression();
 
             _host?.WindowInactivated -= HostWindow_Inactivated;
+            _host?.SystemSettingsChanged -= HostWindow_SystemSettingsChanged;
             RootGrid?.GettingFocus -= RootGrid_GettingFocus;
             RootGrid?.PointerPressed -= RootGrid_PointerPressed;
             RootGrid?.PointerMoved -= RootGrid_PointerMoved;

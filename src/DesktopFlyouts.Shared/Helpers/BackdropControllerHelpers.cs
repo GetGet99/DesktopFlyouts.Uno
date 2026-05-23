@@ -15,6 +15,32 @@ namespace U5BFA.Libraries
     {
         private static UISettings UISettings => field ??= new UISettings();
 
+        internal static DesktopAcrylicController? GetAcrylicController(SystemBackdropTheme theme)
+        {
+            if (!DesktopAcrylicController.IsSupported())
+                return null;
+
+            if (GeneralHelpers.IsTaskbarColorPrevalenceEnabled())
+                return GetAccentedAcrylicController();
+
+            return IsLightTheme(theme)
+                ? GetLightAcrylicController()
+                : GetDarkAcrylicController();
+        }
+
+        internal static MicaController? GetMicaController(SystemBackdropTheme theme)
+        {
+            if (!MicaController.IsSupported())
+                return null;
+
+            if (GeneralHelpers.IsTaskbarColorPrevalenceEnabled())
+                return GetAccentedMicaController();
+
+            return IsLightTheme(theme)
+                ? GetLightMicaController()
+                : GetDarkMicaController();
+        }
+
         internal static DesktopAcrylicController? GetDarkAcrylicController()
         {
             return new DesktopAcrylicController()
@@ -80,6 +106,16 @@ namespace U5BFA.Libraries
                 LuminosityOpacity = 0.8F,
                 TintColor = systemAccentColorDark2,
                 TintOpacity = 0.8F,
+            };
+        }
+
+        private static bool IsLightTheme(SystemBackdropTheme theme)
+        {
+            return theme switch
+            {
+                SystemBackdropTheme.Light => true,
+                SystemBackdropTheme.Dark => false,
+                _ => GeneralHelpers.IsTaskbarLight(),
             };
         }
     }

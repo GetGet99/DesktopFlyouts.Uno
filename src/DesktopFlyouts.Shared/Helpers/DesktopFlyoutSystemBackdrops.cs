@@ -15,7 +15,7 @@ namespace U5BFA.Libraries
     {
         private readonly Dictionary<ICompositionSupportsSystemBackdrop, TargetState> _targets = [];
 
-        protected abstract ISystemBackdropControllerWithTargets? TryCreateController();
+        protected abstract ISystemBackdropControllerWithTargets? TryCreateController(SystemBackdropConfiguration configuration);
 
         protected override void OnTargetConnected(ICompositionSupportsSystemBackdrop target, XamlRoot xamlRoot)
         {
@@ -24,11 +24,11 @@ namespace U5BFA.Libraries
             if (_targets.ContainsKey(target))
                 return;
 
-            var controller = TryCreateController();
+            var configuration = CreateConfiguration(target, xamlRoot);
+            var controller = TryCreateController(configuration);
             if (controller is null)
                 return;
 
-            var configuration = CreateConfiguration(target, xamlRoot);
             controller.SetSystemBackdropConfiguration(configuration);
             controller.AddSystemBackdropTarget(target);
 
@@ -80,21 +80,21 @@ namespace U5BFA.Libraries
 
     internal sealed partial class DesktopFlyoutAcrylicBackdrop : DesktopFlyoutSystemBackdrop
     {
-        protected override ISystemBackdropControllerWithTargets? TryCreateController()
+        protected override ISystemBackdropControllerWithTargets? TryCreateController(SystemBackdropConfiguration configuration)
         {
-            return DesktopAcrylicController.IsSupported()
-                ? new DesktopAcrylicController()
-                : null;
+            return BackdropControllerHelpers.GetAcrylicController(configuration.Theme);
         }
     }
 
     internal sealed partial class DesktopFlyoutMicaBackdrop : DesktopFlyoutSystemBackdrop
     {
-        protected override ISystemBackdropControllerWithTargets? TryCreateController()
+        protected override ISystemBackdropControllerWithTargets? TryCreateController(SystemBackdropConfiguration configuration)
         {
-            return MicaController.IsSupported()
-                ? new MicaController() { Kind = MicaKind.Base }
-                : null;
+            var controller = BackdropControllerHelpers.GetMicaController(configuration.Theme);
+            if (controller is not null)
+                controller.Kind = MicaKind.Base;
+
+            return controller;
         }
     }
 }

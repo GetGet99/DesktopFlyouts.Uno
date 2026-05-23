@@ -98,6 +98,7 @@ namespace U5BFA.Libraries
         }
 
         internal event EventHandler? WindowInactivated;
+        internal event EventHandler? SystemSettingsChanged;
 
         internal XamlIslandHostWindow()
         {
@@ -483,20 +484,23 @@ namespace U5BFA.Libraries
                             PInvoke.SendMessage(_coreHwnd, PInvoke.WM_SIZE, (WPARAM)(nuint)x, y);
                     }
                     break;
-                case PInvoke.WM_SETTINGCHANGE:
-                case PInvoke.WM_THEMECHANGED:
-                    {
-                        // Process CoreWindow message
-                        if (_coreHwnd != default)
-                            PInvoke.SendMessage(_coreHwnd, uMsg, wParam, lParam);
-                    }
-                    break;
                 case PInvoke.WM_DESTROY:
                     {
                         PInvoke.PostQuitMessage(0);
                     }
                     break;
 #endif
+                case PInvoke.WM_SETTINGCHANGE:
+                case PInvoke.WM_THEMECHANGED:
+                    {
+#if UWP
+                        // Process CoreWindow message
+                        if (_coreHwnd != default)
+                            PInvoke.SendMessage(_coreHwnd, uMsg, wParam, lParam);
+#endif
+                        SystemSettingsChanged?.Invoke(this, EventArgs.Empty);
+                    }
+                    break;
                 case PInvoke.WM_SETFOCUS:
                     {
                         if (_activationMode is DesktopFlyoutActivationMode.NeverActivate)
