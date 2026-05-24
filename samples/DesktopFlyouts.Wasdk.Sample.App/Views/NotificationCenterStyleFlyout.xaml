@@ -14,39 +14,41 @@
     PopupDirection="RightToLeft"
     mc:Ignorable="d">
 
-    <local:DesktopFlyoutIsland IslandHeight="*">
-        <Grid>
-            <TextBlock Text="A" />
-        </Grid>
-    </local:DesktopFlyoutIsland>
+    <local:DesktopFlyout.Islands>
+        <local:DesktopFlyoutIsland IslandHeight="*">
+            <Grid>
+                <TextBlock Text="A" />
+            </Grid>
+        </local:DesktopFlyoutIsland>
 
-    <local:DesktopFlyoutIsland IslandHeight="Auto">
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="46" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="48" />
-            </Grid.RowDefinitions>
-            <Grid
-                Padding="18,0"
-                BorderBrush="{ThemeResource FlyoutSeparatorSecondaryBackgroundBrush}"
-                BorderThickness="0,0,0,1">
-                <TextBlock VerticalAlignment="Center" Text="A" />
+        <local:DesktopFlyoutIsland IslandHeight="Auto">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="46" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="48" />
+                </Grid.RowDefinitions>
+                <Grid
+                    Padding="18,0"
+                    BorderBrush="{ThemeResource FlyoutSeparatorSecondaryBackgroundBrush}"
+                    BorderThickness="0,0,0,1">
+                    <TextBlock VerticalAlignment="Center" Text="A" />
+                </Grid>
+                <CalendarView
+                    Grid.Row="1"
+                    Background="{ThemeResource FlyoutOverlayBackgroundBrush}"
+                    BorderThickness="0"
+                    CornerRadius="0" />
+                <Grid
+                    Grid.Row="2"
+                    Padding="18,0"
+                    Background="{ThemeResource FlyoutOverlayBackgroundBrush}"
+                    BorderBrush="{ThemeResource FlyoutSeparatorSecondaryBackgroundBrush}"
+                    BorderThickness="0,1,0,0">
+                    <TextBlock VerticalAlignment="Center" Text="A" />
+                </Grid>
             </Grid>
-            <CalendarView
-                Grid.Row="1"
-                Background="{ThemeResource FlyoutOverlayBackgroundBrush}"
-                BorderThickness="0"
-                CornerRadius="0" />
-            <Grid
-                Grid.Row="2"
-                Padding="18,0"
-                Background="{ThemeResource FlyoutOverlayBackgroundBrush}"
-                BorderBrush="{ThemeResource FlyoutSeparatorSecondaryBackgroundBrush}"
-                BorderThickness="0,1,0,0">
-                <TextBlock VerticalAlignment="Center" Text="A" />
-            </Grid>
-        </Grid>
-    </local:DesktopFlyoutIsland>
+        </local:DesktopFlyoutIsland>
+    </local:DesktopFlyout.Islands>
 
 </local:DesktopFlyout>

@@ -12,8 +12,10 @@
     Placement="BottomCenter"
     mc:Ignorable="d">
 
-    <local:DesktopFlyoutIsland>
-        <TextBlock Margin="32,16" Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit..." />
-    </local:DesktopFlyoutIsland>
+    <local:DesktopFlyout.Islands>
+        <local:DesktopFlyoutIsland>
+            <TextBlock Margin="32,16" Text="Lorem ipsum dolor sit amet, consectetur adipiscing elit..." />
+        </local:DesktopFlyoutIsland>
+    </local:DesktopFlyout.Islands>
 
 </local:DesktopFlyout>

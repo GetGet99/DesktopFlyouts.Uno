@@ -8,32 +8,34 @@
     FlyoutWidth="360"
     mc:Ignorable="d">
 
-    <local:DesktopFlyoutIsland IslandHeight="260">
-        <Grid Padding="18" RowSpacing="14">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+    <local:DesktopFlyout.Islands>
+        <local:DesktopFlyoutIsland IslandHeight="260">
+            <Grid Padding="18" RowSpacing="14">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
 
-            <StackPanel Spacing="4">
-                <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Compact flyout" />
-                <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Single island layout" />
-            </StackPanel>
+                <StackPanel Spacing="4">
+                    <TextBlock Style="{StaticResource SubtitleTextBlockStyle}" Text="Compact flyout" />
+                    <TextBlock Foreground="{ThemeResource TextFillColorSecondaryBrush}" Text="Single island layout" />
+                </StackPanel>
 
-            <StackPanel
-                Grid.Row="1"
-                VerticalAlignment="Center"
-                Spacing="8">
-                <ToggleSwitch Header="Sync status" IsOn="True" />
-                <ProgressBar Value="64" />
-            </StackPanel>
+                <StackPanel
+                    Grid.Row="1"
+                    VerticalAlignment="Center"
+                    Spacing="8">
+                    <ToggleSwitch Header="Sync status" IsOn="True" />
+                    <ProgressBar Value="64" />
+                </StackPanel>
 
-            <Button
-                Grid.Row="2"
-                HorizontalAlignment="Right"
-                Content="Done" />
-        </Grid>
-    </local:DesktopFlyoutIsland>
+                <Button
+                    Grid.Row="2"
+                    HorizontalAlignment="Right"
+                    Content="Done" />
+            </Grid>
+        </local:DesktopFlyoutIsland>
+    </local:DesktopFlyout.Islands>
 
 </local:DesktopFlyout>

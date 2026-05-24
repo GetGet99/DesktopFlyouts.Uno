@@ -13,124 +13,126 @@
     PopupDirection="RightToLeft"
     mc:Ignorable="d">
 
-    <!--  Attention  -->
-    <local:DesktopFlyoutIsland Background="{ThemeResource SystemFillColorAttentionBackgroundBrush}" IslandHeight="150">
-        <Grid
-            Padding="16"
-            ColumnSpacing="8"
-            RowSpacing="8">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid>
-                <FontIcon Foreground="{ThemeResource SystemFillColorAttentionBrush}" Glyph="&#xF136;" />
-                <FontIcon Foreground="{ThemeResource TextFillColorInverseBrush}" Glyph="&#xF13F;" />
+    <local:DesktopFlyout.Islands>
+        <!--  Attention  -->
+        <local:DesktopFlyoutIsland Background="{ThemeResource SystemFillColorAttentionBackgroundBrush}" IslandHeight="150">
+            <Grid
+                Padding="16"
+                ColumnSpacing="8"
+                RowSpacing="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid>
+                    <FontIcon Foreground="{ThemeResource SystemFillColorAttentionBrush}" Glyph="&#xF136;" />
+                    <FontIcon Foreground="{ThemeResource TextFillColorInverseBrush}" Glyph="&#xF13F;" />
+                </Grid>
+                <TextBlock
+                    Grid.Column="1"
+                    Style="{StaticResource SubtitleTextBlockStyle}"
+                    Text="Severity: Informational" />
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Text="This theming should be used when the island needs to draw the user's attention to important information or an ongoing state."
+                    TextWrapping="WrapWholeWords" />
             </Grid>
-            <TextBlock
-                Grid.Column="1"
-                Style="{StaticResource SubtitleTextBlockStyle}"
-                Text="Severity: Informational" />
-            <TextBlock
-                Grid.Row="1"
-                Grid.Column="1"
-                Text="This theming should be used when the island needs to draw the user's attention to important information or an ongoing state."
-                TextWrapping="WrapWholeWords" />
-        </Grid>
-    </local:DesktopFlyoutIsland>
+        </local:DesktopFlyoutIsland>
 
-    <!--  Success  -->
-    <local:DesktopFlyoutIsland Background="{ThemeResource SystemFillColorSuccessBackgroundBrush}" IslandHeight="150">
-        <Grid
-            Padding="16"
-            ColumnSpacing="8"
-            RowSpacing="8">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid>
-                <FontIcon Foreground="{ThemeResource SystemFillColorSuccessBrush}" Glyph="&#xF136;" />
-                <FontIcon Foreground="{ThemeResource TextFillColorInverseBrush}" Glyph="&#xF13E;" />
+        <!--  Success  -->
+        <local:DesktopFlyoutIsland Background="{ThemeResource SystemFillColorSuccessBackgroundBrush}" IslandHeight="150">
+            <Grid
+                Padding="16"
+                ColumnSpacing="8"
+                RowSpacing="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid>
+                    <FontIcon Foreground="{ThemeResource SystemFillColorSuccessBrush}" Glyph="&#xF136;" />
+                    <FontIcon Foreground="{ThemeResource TextFillColorInverseBrush}" Glyph="&#xF13E;" />
+                </Grid>
+                <TextBlock
+                    Grid.Column="1"
+                    Style="{StaticResource SubtitleTextBlockStyle}"
+                    Text="Severity: Success" />
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Text="This theming should be used when the island communicates a successful action, completed task, or other positive outcome."
+                    TextWrapping="WrapWholeWords" />
             </Grid>
-            <TextBlock
-                Grid.Column="1"
-                Style="{StaticResource SubtitleTextBlockStyle}"
-                Text="Severity: Success" />
-            <TextBlock
-                Grid.Row="1"
-                Grid.Column="1"
-                Text="This theming should be used when the island communicates a successful action, completed task, or other positive outcome."
-                TextWrapping="WrapWholeWords" />
-        </Grid>
-    </local:DesktopFlyoutIsland>
+        </local:DesktopFlyoutIsland>
 
-    <!--  Warning  -->
-    <local:DesktopFlyoutIsland Background="{ThemeResource SystemFillColorCautionBackgroundBrush}" IslandHeight="150">
-        <Grid
-            Padding="16"
-            ColumnSpacing="8"
-            RowSpacing="8">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid>
-                <FontIcon Foreground="{ThemeResource SystemFillColorCautionBrush}" Glyph="&#xF136;" />
-                <FontIcon Foreground="{ThemeResource TextFillColorInverseBrush}" Glyph="&#xF13C;" />
+        <!--  Warning  -->
+        <local:DesktopFlyoutIsland Background="{ThemeResource SystemFillColorCautionBackgroundBrush}" IslandHeight="150">
+            <Grid
+                Padding="16"
+                ColumnSpacing="8"
+                RowSpacing="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid>
+                    <FontIcon Foreground="{ThemeResource SystemFillColorCautionBrush}" Glyph="&#xF136;" />
+                    <FontIcon Foreground="{ThemeResource TextFillColorInverseBrush}" Glyph="&#xF13C;" />
+                </Grid>
+                <TextBlock
+                    Grid.Column="1"
+                    Style="{StaticResource SubtitleTextBlockStyle}"
+                    Text="Severity: Warning" />
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Text="This theming should be used when the island communicates a cautionary state that may require user awareness or action."
+                    TextWrapping="WrapWholeWords" />
             </Grid>
-            <TextBlock
-                Grid.Column="1"
-                Style="{StaticResource SubtitleTextBlockStyle}"
-                Text="Severity: Warning" />
-            <TextBlock
-                Grid.Row="1"
-                Grid.Column="1"
-                Text="This theming should be used when the island communicates a cautionary state that may require user awareness or action."
-                TextWrapping="WrapWholeWords" />
-        </Grid>
-    </local:DesktopFlyoutIsland>
+        </local:DesktopFlyoutIsland>
 
-    <!--  Critical  -->
-    <local:DesktopFlyoutIsland Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}" IslandHeight="150">
-        <Grid
-            Padding="16"
-            ColumnSpacing="8"
-            RowSpacing="8">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid>
-                <FontIcon Foreground="{ThemeResource SystemFillColorCriticalBrush}" Glyph="&#xF136;" />
-                <FontIcon Foreground="{ThemeResource TextFillColorInverseBrush}" Glyph="&#xF13D;" />
+        <!--  Critical  -->
+        <local:DesktopFlyoutIsland Background="{ThemeResource SystemFillColorCriticalBackgroundBrush}" IslandHeight="150">
+            <Grid
+                Padding="16"
+                ColumnSpacing="8"
+                RowSpacing="8">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid>
+                    <FontIcon Foreground="{ThemeResource SystemFillColorCriticalBrush}" Glyph="&#xF136;" />
+                    <FontIcon Foreground="{ThemeResource TextFillColorInverseBrush}" Glyph="&#xF13D;" />
+                </Grid>
+                <TextBlock
+                    Grid.Column="1"
+                    Style="{StaticResource SubtitleTextBlockStyle}"
+                    Text="Severity: Critical" />
+                <TextBlock
+                    Grid.Row="1"
+                    Grid.Column="1"
+                    Text="This theming should be used when the island communicates a critical or destructive state that requires immediate attention."
+                    TextWrapping="WrapWholeWords" />
             </Grid>
-            <TextBlock
-                Grid.Column="1"
-                Style="{StaticResource SubtitleTextBlockStyle}"
-                Text="Severity: Critical" />
-            <TextBlock
-                Grid.Row="1"
-                Grid.Column="1"
-                Text="This theming should be used when the island communicates a critical or destructive state that requires immediate attention."
-                TextWrapping="WrapWholeWords" />
-        </Grid>
-    </local:DesktopFlyoutIsland>
+        </local:DesktopFlyoutIsland>
+    </local:DesktopFlyout.Islands>
 
 </local:DesktopFlyout>
