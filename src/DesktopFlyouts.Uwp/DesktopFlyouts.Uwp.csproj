@@ -1,20 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	
 	<PropertyGroup>
 
-		<TargetFrameworks>net9.0-windows10.0.26100;net10.0-windows10.0.26100</TargetFrameworks>
-		<Configurations>Debug;Release</Configurations>
-		<Platforms>x86;x64;arm64</Platforms>
-		<RootNamespace>DesktopFlyouts</RootNamespace>
-		<Nullable>enable</Nullable>
-		<PublishAot>true</PublishAot>
-		<DisableRuntimeMarshalling>true</DisableRuntimeMarshalling>
-		<CsWin32RunAsBuildTask>true</CsWin32RunAsBuildTask>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<LangVersion>preview</LangVersion>
+		<TargetFrameworks>net9.0-windows$(TargetWindowsVersion);net10.0-windows$(TargetWindowsVersion)</TargetFrameworks>
 		<NoWarn>$(NoWarn);CS8305;NU5104;CS1591</NoWarn>
 		<DefineConstants>$(DefineConstants);UWP</DefineConstants>
-		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
 
 		<UseUwp>true</UseUwp>
 		<DisableEmbeddedXbf>false</DisableEmbeddedXbf>
