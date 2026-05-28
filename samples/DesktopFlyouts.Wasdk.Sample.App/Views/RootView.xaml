@@ -97,6 +97,9 @@
                 <wctcontrols:SettingsCard Header="Swipe to dismiss">
                     <ToggleSwitch IsEnabled="{x:Bind ViewModel.IsModifiable, Mode=OneWay}" IsOn="{x:Bind ViewModel.IsSwipeToDismissEnabled, Mode=TwoWay}" />
                 </wctcontrols:SettingsCard>
+                <wctcontrols:SettingsCard Header="Drag move">
+                    <ToggleSwitch IsEnabled="{x:Bind ViewModel.IsModifiable, Mode=OneWay}" IsOn="{x:Bind ViewModel.IsDragMoveEnabled, Mode=TwoWay}" />
+                </wctcontrols:SettingsCard>
                 <wctcontrols:SettingsCard Header="Swipe dismiss threshold">
                     <NumberBox
                         x:Name="SwipeDismissThresholdNumberBox"

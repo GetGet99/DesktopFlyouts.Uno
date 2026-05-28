@@ -106,6 +106,12 @@ Use `TimeSpan.Zero` or a negative value to disable automatic close.
 <desktop:DesktopFlyout PressedScale="0.92" />
 ```
 
+`IsDragMoveEnabled` lets the user move the open flyout by dragging it with the cursor. The flyout stays inside the current monitor work area.
+
+```xml
+<desktop:DesktopFlyout IsDragMoveEnabled="True" />
+```
+
 `IsSwipeToDismissEnabled` enables swipe-to-dismiss in the opposite direction of the active popup direction.
 
 ```xml

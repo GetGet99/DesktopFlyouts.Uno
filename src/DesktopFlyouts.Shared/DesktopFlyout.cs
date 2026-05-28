@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Threading.Tasks;
 using Windows.Graphics;
 using FoundationPoint = Windows.Foundation.Point;
+using FoundationRect = Windows.Foundation.Rect;
 using FoundationSize = Windows.Foundation.Size;
 
 #if UWP
@@ -48,6 +49,7 @@ namespace DesktopFlyouts
         private const string PART_IslandsGrid = "PART_IslandsGrid";
         private const double SwipeDismissDragStartThreshold = 4.0D;
         private const double SwipeDismissAxisDominanceRatio = 1.2D;
+        private const double DragMoveStartThreshold = 4.0D;
 
         private readonly XamlIslandHostWindow? _host;
         private bool _isPopupAnimationPlaying;
@@ -59,13 +61,19 @@ namespace DesktopFlyouts
         private Storyboard? _pressScaleStoryboard;
         private Storyboard? _swipeDismissRestoreStoryboard;
         private FoundationPoint _swipeDismissStartPoint;
+        private Point _dragMoveStartCursorPoint;
+        private Point? _dragMoveOrigin;
+        private FoundationRect _dragMoveStartWindowRect;
         private double _pressScaleTargetScale = 1.0D;
         private uint _swipeDismissPointerId;
+        private uint _dragMovePointerId;
         private int _restoreActivationTickCount;
         private readonly List<(Control Control, bool IsTabStop)> _suppressedTabStopStates = [];
         private readonly List<(FrameworkElement Element, bool AllowFocusOnInteraction)> _suppressedInteractionFocusStates = [];
         private bool _isSwipeDismissTracking;
         private bool _isSwipeDismissDragging;
+        private bool _isDragMoveTracking;
+        private bool _isDragMoving;
         private bool _isFocusManagerGettingFocusSubscribed;
         private bool _disposed;
 
@@ -145,6 +153,7 @@ namespace DesktopFlyouts
 
             StopAutoCloseTimer();
             StopRestoreActivationTimer();
+            _dragMoveOrigin = null;
             _isPopupAnimationPlaying = true;
             var shouldActivateOnOpen = ShouldActivateOnOpen();
             if (!shouldActivateOnOpen)
@@ -246,6 +255,7 @@ namespace DesktopFlyouts
             StopAutoCloseTimer();
             StopRestoreActivationTimer();
             StopSwipeDismissRestoreStoryboard();
+            ResetDragMoveTracking();
             ResetSwipeDismissTracking();
 
             if (_disposed || RootGrid is null || _isPopupAnimationPlaying)
@@ -361,9 +371,10 @@ namespace DesktopFlyouts
         private DesktopFlyoutPopupDirection UpdateFlyoutRegion()
         {
             if (_host?.DesktopWindowXamlSource is null || IslandsGrid is null)
-                return ResolvePopupDirection(PopupDirection, default, WindowHelpers.GetFlyoutWorkAreaRect(_customPlacementBottomCenterPoint));
+                return ResolvePopupDirection(PopupDirection, default, WindowHelpers.GetFlyoutWorkAreaRect(_customPlacementBottomCenterPoint ?? _dragMoveOrigin));
 
             var customBottomCenterPoint = _customPlacementBottomCenterPoint;
+            var dragMoveOrigin = _dragMoveOrigin;
             var scale = _host.XamlIslandRasterizationScale;
             var flyoutWidth = GetCurrentFlyoutWidth();
             var flyoutHeight = GetCurrentFlyoutHeight();
@@ -371,7 +382,7 @@ namespace DesktopFlyouts
             var scaledMargin = GetScaledMargin(Margin, scale);
             var frameWidth = scaledFlyoutSize.Width + scaledMargin.Left + scaledMargin.Right;
             var frameHeight = scaledFlyoutSize.Height + scaledMargin.Top + scaledMargin.Bottom;
-            var workArea = WindowHelpers.GetFlyoutWorkAreaRect(customBottomCenterPoint);
+            var workArea = WindowHelpers.GetFlyoutWorkAreaRect(customBottomCenterPoint ?? dragMoveOrigin);
             var hostWidth = workArea.Width;
             var hostHeight = workArea.Height;
             var regionWidth = Math.Max(1, (int)Math.Ceiling(Math.Min(frameWidth, hostWidth)));
@@ -391,6 +402,10 @@ namespace DesktopFlyouts
                     scaledFlyoutSize,
                     scaledMargin,
                     workArea);
+            }
+            else if (dragMoveOrigin is Point origin)
+            {
+                (left, top) = (origin.X, origin.Y);
             }
             else
             {
@@ -508,6 +523,7 @@ namespace DesktopFlyouts
         private void CompleteOpen()
         {
             StopSwipeDismissRestoreStoryboard();
+            ResetDragMoveTracking();
             ResetSwipeDismissTracking();
             SetOpenTransform();
             _isPopupAnimationPlaying = false;
@@ -523,12 +539,14 @@ namespace DesktopFlyouts
         {
             StopAutoCloseTimer();
             StopSwipeDismissRestoreStoryboard();
+            ResetDragMoveTracking();
             ResetSwipeDismissTracking();
             RestoreFocusSuppression();
             ResetPressedScale();
             SetClosedTransform(_activePopupDirection);
             _isPopupAnimationPlaying = false;
             IsOpen = false;
+            _dragMoveOrigin = null;
             _host?.UpdateWindowVisibility(false);
         }
 
@@ -660,14 +678,17 @@ namespace DesktopFlyouts
                 return;
 
             var isPressedScaleEnabled = IsPressedScaleEnabled();
+            var isDragMoveEnabled = CanStartDragMove();
             var isSwipeDismissEnabled = CanStartSwipeDismiss();
-            if (!isPressedScaleEnabled && !isSwipeDismissEnabled)
+            if (!isPressedScaleEnabled && !isDragMoveEnabled && !isSwipeDismissEnabled)
                 return;
 
             StopSwipeDismissRestoreStoryboard();
             RootGrid.CapturePointer(e.Pointer);
 
-            if (isSwipeDismissEnabled)
+            if (isDragMoveEnabled)
+                StartDragMove(e);
+            else if (isSwipeDismissEnabled)
                 StartSwipeDismiss(e);
 
             if (isPressedScaleEnabled)
@@ -679,16 +700,26 @@ namespace DesktopFlyouts
 
         private void RootGrid_PointerMoved(object sender, PointerRoutedEventArgs e)
         {
+            if (UpdateDragMove(e))
+            {
+                e.Handled = true;
+                return;
+            }
+
             if (UpdateSwipeDismiss(e))
                 e.Handled = true;
         }
 
         private void RootGrid_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
-            var dismissedBySwipe = CompleteSwipeDismiss(e);
+            var movedByDrag = CompleteDragMove(e);
+            var dismissedBySwipe = movedByDrag ? false : CompleteSwipeDismiss(e);
 
             if (RootGrid is not null)
                 RootGrid.ReleasePointerCapture(e.Pointer);
+
+            if (movedByDrag)
+                e.Handled = true;
 
             if (!dismissedBySwipe)
                 RestorePressedScale();
@@ -696,20 +727,116 @@ namespace DesktopFlyouts
 
         private void RootGrid_PointerCanceled(object sender, PointerRoutedEventArgs e)
         {
+            CancelDragMove();
             CancelSwipeDismiss();
             RestorePressedScale();
         }
 
         private void RootGrid_PointerCaptureLost(object sender, PointerRoutedEventArgs e)
         {
+            CancelDragMove();
             CancelSwipeDismiss();
             RestorePressedScale();
         }
 
         private void RootGrid_PointerExited(object sender, PointerRoutedEventArgs e)
         {
-            if (!_isSwipeDismissDragging)
+            if (!_isSwipeDismissDragging && !_isDragMoving)
                 RestorePressedScale();
+        }
+
+        private bool CanStartDragMove()
+        {
+            return IsDragMoveEnabled &&
+                IsOpen &&
+                RootGrid is not null &&
+                _host?.DesktopWindowXamlSource is not null;
+        }
+
+        private void StartDragMove(PointerRoutedEventArgs e)
+        {
+            if (_host is null || !WindowHelpers.TryGetCursorPoint(out var cursorPoint))
+                return;
+
+            _dragMovePointerId = e.Pointer.PointerId;
+            _dragMoveStartCursorPoint = cursorPoint;
+            _dragMoveStartWindowRect = _host.WindowSize;
+            _isDragMoveTracking = true;
+            _isDragMoving = false;
+        }
+
+        private bool UpdateDragMove(PointerRoutedEventArgs e)
+        {
+            if (!_isDragMoveTracking || e.Pointer.PointerId != _dragMovePointerId || _host is null)
+                return false;
+
+            if (!WindowHelpers.TryGetCursorPoint(out var cursorPoint))
+                return false;
+
+            var offsetX = cursorPoint.X - _dragMoveStartCursorPoint.X;
+            var offsetY = cursorPoint.Y - _dragMoveStartCursorPoint.Y;
+            if (!_isDragMoving && !CanStartDragMoveDrag(offsetX, offsetY))
+                return false;
+
+            if (!_isDragMoving)
+            {
+                _isDragMoving = true;
+                StopAutoCloseTimer();
+                ResetSwipeDismissTracking();
+                RestorePressedScale();
+            }
+
+            var width = Math.Max(1, (int)Math.Round(_dragMoveStartWindowRect.Width));
+            var height = Math.Max(1, (int)Math.Round(_dragMoveStartWindowRect.Height));
+            var nextRect = new RectInt32(
+                (int)Math.Round(_dragMoveStartWindowRect.X + offsetX),
+                (int)Math.Round(_dragMoveStartWindowRect.Y + offsetY),
+                width,
+                height);
+            var workArea = WindowHelpers.GetFlyoutWorkAreaRect(cursorPoint);
+            nextRect = ClampWindowRectToWorkArea(nextRect, workArea);
+
+            _host.MoveAndResize(nextRect, ShouldActivateOnOpen());
+            _dragMoveOrigin = new(nextRect.X, nextRect.Y);
+            _activePopupDirection = ResolvePopupDirection(PopupDirection, nextRect, workArea);
+
+            return true;
+        }
+
+        private bool CompleteDragMove(PointerRoutedEventArgs e)
+        {
+            if (!_isDragMoveTracking || e.Pointer.PointerId != _dragMovePointerId)
+                return false;
+
+            var moved = _isDragMoving;
+            ResetDragMoveTracking();
+
+            if (moved)
+                RestartAutoCloseTimer();
+
+            return moved;
+        }
+
+        private void CancelDragMove()
+        {
+            var shouldRestartAutoCloseTimer = _isDragMoving;
+            ResetDragMoveTracking();
+
+            if (shouldRestartAutoCloseTimer)
+                RestartAutoCloseTimer();
+        }
+
+        private void ResetDragMoveTracking()
+        {
+            _isDragMoveTracking = false;
+            _isDragMoving = false;
+            _dragMovePointerId = 0;
+        }
+
+        private bool CanStartDragMoveDrag(double offsetX, double offsetY)
+        {
+            var threshold = DragMoveStartThreshold * (_host?.XamlIslandRasterizationScale ?? 1.0D);
+            return Math.Abs(offsetX) >= threshold || Math.Abs(offsetY) >= threshold;
         }
 
         private bool CanStartSwipeDismiss()
@@ -1200,6 +1327,18 @@ namespace DesktopFlyouts
                 DesktopFlyoutPlacementMode.RightCenter => (workArea.Right - width, workArea.Top + ((workArea.Height - height) / 2)),
                 _ => (workArea.Right - width, workArea.Bottom - height),
             };
+        }
+
+        private static RectInt32 ClampWindowRectToWorkArea(RectInt32 rect, Rectangle workArea)
+        {
+            var left = Clamp(rect.X, workArea.Left, workArea.Right - rect.Width);
+            var top = Clamp(rect.Y, workArea.Top, workArea.Bottom - rect.Height);
+
+            return new(
+                (int)Math.Round(left),
+                (int)Math.Round(top),
+                rect.Width,
+                rect.Height);
         }
 
         private static DesktopFlyoutPopupDirection ResolvePopupDirection(DesktopFlyoutPopupDirection requestedDirection, RectInt32 region, Rectangle workArea)

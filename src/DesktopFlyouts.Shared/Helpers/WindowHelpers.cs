@@ -21,6 +21,19 @@ namespace DesktopFlyouts
 
     internal unsafe static partial class WindowHelpers
     {
+        internal static bool TryGetCursorPoint(out Point point)
+        {
+            Point cursorPoint = default;
+            if (!PInvoke.GetCursorPos(&cursorPoint))
+            {
+                point = default;
+                return false;
+            }
+
+            point = cursorPoint;
+            return true;
+        }
+
         internal static Point GetBottomRightCornerPoint()
         {
             var rect = GetFlyoutWorkAreaRect();
