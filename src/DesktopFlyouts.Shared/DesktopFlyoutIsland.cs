@@ -126,10 +126,19 @@ namespace DesktopFlyouts
                 ? owner.CreateIslandSystemBackdrop()
                 : null;
         }
+
+        internal void ClearOwnerBackdrop()
+        {
+            TemplateSettings.SystemBackdrop = null;
+        }
 #endif
 
         private void DesktopFlyoutIsland_Unloaded(object sender, RoutedEventArgs e)
         {
+#if WASDK
+            ClearOwnerBackdrop();
+#endif
+
             UnregisterPropertyChangedCallback(CornerRadiusProperty, _propertyChangedCallbackTokenForCornerRadiusProperty);
 
             Unloaded -= DesktopFlyoutIsland_Unloaded;

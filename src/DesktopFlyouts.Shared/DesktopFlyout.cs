@@ -354,6 +354,9 @@ namespace DesktopFlyouts
 #endif
                     host.SystemSettingsChanged -= HostWindow_SystemSettingsChanged;
                     host.TakeFocusRequested -= HostWindow_TakeFocusRequested;
+#if WASDK
+                    island.ClearOwnerBackdrop();
+#endif
                     host.Dispose();
                     _islandHosts.Remove(island);
                 }
@@ -1944,6 +1947,9 @@ namespace DesktopFlyouts
 #endif
                 item.Value.SystemSettingsChanged -= HostWindow_SystemSettingsChanged;
                 item.Value.TakeFocusRequested -= HostWindow_TakeFocusRequested;
+#if WASDK
+                item.Key.ClearOwnerBackdrop();
+#endif
                 item.Value.Dispose();
             }
 

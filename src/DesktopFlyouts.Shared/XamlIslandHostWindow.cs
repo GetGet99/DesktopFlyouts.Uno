@@ -918,9 +918,14 @@ namespace DesktopFlyouts
 #endif
                 if (DesktopWindowXamlSource is not null)
                     DesktopWindowXamlSource.TakeFocusRequested -= DesktopWindowXamlSource_TakeFocusRequested;
+                if (_contentRoot is not null)
+                    _contentRoot.Child = null;
+                if (DesktopWindowXamlSource is not null)
+                    DesktopWindowXamlSource.Content = null;
                 DesktopWindowXamlSource?.Dispose();
             }
             catch { }
+            _contentRoot = null;
             DesktopWindowXamlSource = null;
 #if WASDK
             _nonClientPointerSource = null;
