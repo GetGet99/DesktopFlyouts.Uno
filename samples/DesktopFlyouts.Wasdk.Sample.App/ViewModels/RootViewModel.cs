@@ -32,9 +32,6 @@ namespace DesktopFlyouts
         internal partial bool IsSwipeToDismissEnabled { get; set; }
 
         [ObservableProperty]
-        internal partial bool IsDragMoveEnabled { get; set; }
-
-        [ObservableProperty]
         internal partial double SwipeDismissThresholdValue { get; set; } = 80D;
 
         [ObservableProperty]
@@ -119,7 +116,7 @@ namespace DesktopFlyouts
 
         partial void OnIconPathChanged(string? value)
         {
-            TrayIconManager.Default.SystemTrayIcon?.IconPath = value ?? string.Empty;
+            TrayIconManager.Default.SystemTrayIcon?.SetIcon(value ?? string.Empty);
         }
 
         partial void OnTooltipTextChanged(string? value)
@@ -143,12 +140,6 @@ namespace DesktopFlyouts
         {
             if (IsDefaultFlyoutSelected())
                 TrayIconManager.Default.DesktopFlyout!.IsSwipeToDismissEnabled = value;
-        }
-
-        partial void OnIsDragMoveEnabledChanged(bool value)
-        {
-            if (IsDefaultFlyoutSelected())
-                TrayIconManager.Default.DesktopFlyout!.IsDragMoveEnabled = value;
         }
 
         partial void OnSwipeDismissThresholdValueChanged(double value)
@@ -228,7 +219,6 @@ namespace DesktopFlyouts
             flyout.ActivationMode = ActivationModes.ElementAt(SelectedActivationModeIndex).Key;
             flyout.HideOnLostFocus = HideOnLostFocus;
             flyout.IsSwipeToDismissEnabled = IsSwipeToDismissEnabled;
-            flyout.IsDragMoveEnabled = IsDragMoveEnabled;
             flyout.SwipeDismissThreshold = SwipeDismissThresholdValue;
             flyout.IsBackdropEnabled = IsBackdropEnabled;
             flyout.Placement = FlyoutPlacements.ElementAt(SelectedFlyoutPlacementIndex).Key;
