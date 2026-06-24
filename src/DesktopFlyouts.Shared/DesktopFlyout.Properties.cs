@@ -71,9 +71,7 @@ namespace DesktopFlyouts
         /// <value>The desired flyout width. The default is <see cref="GridLength.Auto"/>.</value>
         /// <remarks>
         /// Use pixel, auto, or star sizing. Star sizing stretches to the available work-area width
-        /// after subtracting <see cref="FrameworkElement.Margin"/>. This value is ignored when
-        /// <see cref="IslandLayoutMode"/> is <see cref="DesktopFlyoutIslandLayoutMode.Freeform"/>;
-        /// freeform layout uses the monitor work-area width.
+        /// after subtracting <see cref="FrameworkElement.Margin"/>.
         /// </remarks>
         public GridLength FlyoutWidth
         {
@@ -93,9 +91,7 @@ namespace DesktopFlyouts
         /// <value>The desired flyout height. The default is <see cref="GridLength.Auto"/>.</value>
         /// <remarks>
         /// Use pixel, auto, or star sizing. Star sizing stretches to the available work-area height
-        /// after subtracting <see cref="FrameworkElement.Margin"/>. This value is ignored when
-        /// <see cref="IslandLayoutMode"/> is <see cref="DesktopFlyoutIslandLayoutMode.Freeform"/>;
-        /// freeform layout uses the monitor work-area height.
+        /// after subtracting <see cref="FrameworkElement.Margin"/>.
         /// </remarks>
         public GridLength FlyoutHeight
         {
@@ -117,37 +113,9 @@ namespace DesktopFlyouts
         /// <summary>
         /// Gets or sets how islands are arranged.
         /// </summary>
-        /// <value>The orientation used to arrange <see cref="Islands"/> when <see cref="IslandLayoutMode"/> is <see cref="DesktopFlyoutIslandLayoutMode.Stack"/>. The default is <see cref="Orientation.Vertical"/>.</value>
-        /// <remarks>
-        /// This value is ignored when <see cref="IslandLayoutMode"/> is
-        /// <see cref="DesktopFlyoutIslandLayoutMode.Freeform"/>.
-        /// </remarks>
+        /// <value>The orientation used to arrange <see cref="Islands"/>. The default is <see cref="Orientation.Vertical"/>.</value>
         [GeneratedDependencyProperty(DefaultValue = Orientation.Vertical)]
         public partial Orientation IslandsOrientation { get; set; }
-
-        /// <summary>
-        /// Gets or sets the layout mode used to arrange islands.
-        /// </summary>
-        /// <value>The island layout mode. The default is <see cref="DesktopFlyoutIslandLayoutMode.Stack"/>.</value>
-        /// <remarks>
-        /// <see cref="DesktopFlyoutIslandLayoutMode.Stack"/> arranges islands in a grid using
-        /// <see cref="IslandsOrientation"/>. <see cref="DesktopFlyoutIslandLayoutMode.Freeform"/>
-        /// arranges islands on a monitor-sized canvas using each island's canvas position.
-        /// </remarks>
-        [GeneratedDependencyProperty(DefaultValue = DesktopFlyoutIslandLayoutMode.Stack)]
-        public partial DesktopFlyoutIslandLayoutMode IslandLayoutMode { get; set; }
-
-        /// <summary>
-        /// Gets or sets how the native flyout window can be moved by dragging.
-        /// </summary>
-        /// <value>The native drag mode. The default is <see cref="DesktopFlyoutDragMode.None"/>.</value>
-        /// <remarks>
-        /// <see cref="DesktopFlyoutDragMode.Full"/> treats the whole flyout surface as a native
-        /// window drag area. <see cref="DesktopFlyoutDragMode.Region"/> uses
-        /// <see cref="DesktopFlyoutDragRegion"/> elements as native drag areas.
-        /// </remarks>
-        [GeneratedDependencyProperty(DefaultValue = DesktopFlyoutDragMode.None)]
-        public partial DesktopFlyoutDragMode DragMode { get; set; }
 
         /// <summary>
         /// Gets or sets the flyout placement on the work area.
@@ -195,6 +163,18 @@ namespace DesktopFlyouts
         /// <value><see langword="true"/> to allow swipe-to-dismiss; otherwise, <see langword="false"/>. The default is <see langword="false"/>.</value>
         [GeneratedDependencyProperty(DefaultValue = false)]
         public partial bool IsSwipeToDismissEnabled { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the flyout can be moved by dragging it with the cursor.
+        /// </summary>
+        /// <value><see langword="true"/> to allow cursor drag movement; otherwise, <see langword="false"/>. The default is <see langword="false"/>.</value>
+        /// <remarks>
+        /// Drag movement moves the desktop host window and is clamped to the current monitor work area.
+        /// When enabled, drag movement takes precedence over swipe-to-dismiss for pointer drags that
+        /// start on the flyout surface.
+        /// </remarks>
+        [GeneratedDependencyProperty(DefaultValue = false)]
+        public partial bool IsDragMoveEnabled { get; set; }
 
         /// <summary>
         /// Gets or sets the swipe distance in DIPs required to dismiss the flyout.
@@ -257,12 +237,7 @@ namespace DesktopFlyouts
         private static void OnFlyoutSizePropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
         {
             if (dependencyObject is DesktopFlyout flyout)
-            {
-                if (flyout.IslandLayoutMode is DesktopFlyoutIslandLayoutMode.Freeform)
-                    return;
-
                 flyout.UpdateOpenFlyoutLayout();
-            }
         }
 
         private static void OnAutoCloseDelayPropertyChanged(DependencyObject dependencyObject, DependencyPropertyChangedEventArgs e)
@@ -289,29 +264,8 @@ namespace DesktopFlyouts
             if (ReferenceEquals(e.NewValue, e.OldValue))
                 return;
 
-            if (IslandLayoutMode is DesktopFlyoutIslandLayoutMode.Freeform)
-                return;
-
             UpdateIslands();
             UpdateOpenFlyoutLayout();
-        }
-
-        partial void OnIslandLayoutModePropertyChanged(DependencyPropertyChangedEventArgs e)
-        {
-            if ((DesktopFlyoutIslandLayoutMode)e.NewValue == (DesktopFlyoutIslandLayoutMode)e.OldValue)
-                return;
-
-            UpdateIslands();
-            UpdateOpenFlyoutLayout();
-        }
-
-        partial void OnDragModePropertyChanged(DependencyPropertyChangedEventArgs e)
-        {
-            if ((DesktopFlyoutDragMode)e.NewValue == (DesktopFlyoutDragMode)e.OldValue)
-                return;
-
-            UpdateHostDragMode();
-            UpdateHostDragRegions();
         }
 
         partial void OnIsBackdropEnabledPropertyChanged(DependencyPropertyChangedEventArgs e)
@@ -335,9 +289,7 @@ namespace DesktopFlyouts
             if ((DesktopFlyoutActivationMode)e.NewValue == (DesktopFlyoutActivationMode)e.OldValue)
                 return;
 
-            foreach (var host in _islandHosts.Values)
-                host.SetActivationMode((DesktopFlyoutActivationMode)e.NewValue);
-
+            _host?.SetActivationMode((DesktopFlyoutActivationMode)e.NewValue);
             UpdateFocusSuppression();
         }
     }

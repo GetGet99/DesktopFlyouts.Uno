@@ -201,26 +201,15 @@
                 </wctcontrols:SettingsCard>
             </StackPanel>
 
-            <StackPanel Spacing="4" Visibility="{x:Bind ViewModel.DraggableSettingsVisibility, Mode=OneWay}">
+            <StackPanel Spacing="4" Visibility="{x:Bind ViewModel.DragMoveSettingsVisibility, Mode=OneWay}">
                 <TextBlock
                     Margin="4,0"
                     Style="{StaticResource BodyStrongTextBlockStyle}"
                     Text="Draggable settings" />
                 <wctcontrols:SettingsCard
-                    Description="Chooses stacked or freeform island layout."
-                    Header="Island layout">
-                    <ComboBox
-                        Width="150"
-                        ItemsSource="{x:Bind ViewModel.IslandLayoutModes.Values}"
-                        SelectedIndex="{x:Bind ViewModel.SelectedDraggableIslandLayoutModeIndex, Mode=TwoWay}" />
-                </wctcontrols:SettingsCard>
-                <wctcontrols:SettingsCard
-                    Description="Chooses which native area moves the flyout window."
-                    Header="Drag mode">
-                    <ComboBox
-                        Width="150"
-                        ItemsSource="{x:Bind ViewModel.DragModes.Values}"
-                        SelectedIndex="{x:Bind ViewModel.SelectedDraggableDragModeIndex, Mode=TwoWay}" />
+                    Description="Lets the cursor drag the flyout window."
+                    Header="Drag move">
+                    <ToggleSwitch IsOn="{x:Bind ViewModel.IsDragMoveEnabled, Mode=TwoWay}" />
                 </wctcontrols:SettingsCard>
                 <wctcontrols:SettingsCard
                     Description="Controls where Show places the flyout."
@@ -231,9 +220,8 @@
                         SelectedIndex="{x:Bind ViewModel.SelectedDraggablePopupPositionIndex, Mode=TwoWay}" />
                 </wctcontrols:SettingsCard>
                 <wctcontrols:SettingsCard
-                    Description="Sets FlyoutWidth for stack layout. Freeform uses the monitor width."
-                    Header="Flyout width"
-                    IsEnabled="{x:Bind ViewModel.IsDraggableFlyoutSizeEnabled, Mode=OneWay}">
+                    Description="Sets FlyoutWidth. Use 0 for Auto."
+                    Header="Flyout width">
                     <NumberBox
                         x:Name="DraggableFlyoutWidthNumberBox"
                         Width="150"
@@ -244,9 +232,8 @@
                         Value="{x:Bind ViewModel.DraggableFlyoutWidthValue, Mode=TwoWay}" />
                 </wctcontrols:SettingsCard>
                 <wctcontrols:SettingsCard
-                    Description="Sets FlyoutHeight for stack layout. Freeform uses the monitor height."
-                    Header="Flyout height"
-                    IsEnabled="{x:Bind ViewModel.IsDraggableFlyoutSizeEnabled, Mode=OneWay}">
+                    Description="Sets FlyoutHeight. Use 0 for Auto."
+                    Header="Flyout height">
                     <NumberBox
                         x:Name="DraggableFlyoutHeightNumberBox"
                         Width="150"

@@ -59,22 +59,16 @@ namespace DesktopFlyouts
         internal partial bool HideOnLostFocus { get; set; } = true;
 
         [ObservableProperty]
-        internal partial int SelectedDraggableIslandLayoutModeIndex { get; set; } = 1;
-
-        [ObservableProperty]
-        internal partial bool IsDraggableFlyoutSizeEnabled { get; set; }
-
-        [ObservableProperty]
-        internal partial int SelectedDraggableDragModeIndex { get; set; } = 2;
+        internal partial bool IsDragMoveEnabled { get; set; } = true;
 
         [ObservableProperty]
         internal partial int SelectedDraggablePopupPositionIndex { get; set; } = 4;
 
         [ObservableProperty]
-        internal partial double DraggableFlyoutWidthValue { get; set; } = 620D;
+        internal partial double DraggableFlyoutWidthValue { get; set; } = 360D;
 
         [ObservableProperty]
-        internal partial double DraggableFlyoutHeightValue { get; set; } = 340D;
+        internal partial double DraggableFlyoutHeightValue { get; set; } = double.NaN;
 
         [ObservableProperty]
         internal partial int SelectedSeverityPopupPositionIndex { get; set; } = 5;
@@ -104,7 +98,7 @@ namespace DesktopFlyouts
         internal partial Visibility IndicatorSettingsVisibility { get; set; } = Visibility.Collapsed;
 
         [ObservableProperty]
-        internal partial Visibility DraggableSettingsVisibility { get; set; } = Visibility.Collapsed;
+        internal partial Visibility DragMoveSettingsVisibility { get; set; } = Visibility.Collapsed;
 
         [ObservableProperty]
         internal partial Visibility SeveritySettingsVisibility { get; set; } = Visibility.Collapsed;
@@ -115,8 +109,6 @@ namespace DesktopFlyouts
         public Dictionary<DesktopFlyoutPopupDirection, string> PopupDirections { get; private set; } = [];
         public Dictionary<DesktopFlyoutPlacementMode, string> FlyoutPlacements { get; private set; } = [];
         public Dictionary<DesktopFlyoutActivationMode, string> ActivationModes { get; private set; } = [];
-        public Dictionary<DesktopFlyoutIslandLayoutMode, string> IslandLayoutModes { get; private set; } = [];
-        public Dictionary<DesktopFlyoutDragMode, string> DragModes { get; private set; } = [];
         public Dictionary<DesktopFlyoutSampleKind, string> FlyoutExamples { get; private set; } = [];
         public Dictionary<DesktopFlyoutBackdropKind, string> SystemBackdrops { get; private set; } = [];
 
@@ -158,13 +150,6 @@ namespace DesktopFlyouts
 
             SystemBackdrops.Add(DesktopFlyoutBackdropKind.Mica, "Mica");
             SystemBackdrops.Add(DesktopFlyoutBackdropKind.DesktopAcrylic, "Desktop Acrylic");
-
-            IslandLayoutModes.Add(DesktopFlyoutIslandLayoutMode.Stack, "Stack");
-            IslandLayoutModes.Add(DesktopFlyoutIslandLayoutMode.Freeform, "Freeform");
-
-            DragModes.Add(DesktopFlyoutDragMode.None, "None");
-            DragModes.Add(DesktopFlyoutDragMode.Full, "Full");
-            DragModes.Add(DesktopFlyoutDragMode.Region, "Region");
 
             ToggleFlyoutOpenCommand = new RelayCommand(ExecuteToggleFlyoutOpenCommand);
 
@@ -261,23 +246,10 @@ namespace DesktopFlyouts
                 flyout.HideOnLostFocus = value;
         }
 
-        partial void OnSelectedDraggableIslandLayoutModeIndexChanged(int value)
+        partial void OnIsDragMoveEnabledChanged(bool value)
         {
-            if (!TryGetValue(IslandLayoutModes, value, out var layoutMode))
-                return;
-
-            IsDraggableFlyoutSizeEnabled = layoutMode is DesktopFlyoutIslandLayoutMode.Stack;
             if (TrayIconManager.Default.DesktopFlyout is DraggableFlyout flyout)
-            {
-                flyout.IslandLayoutMode = layoutMode;
-                ApplyDraggableFlyoutSize(flyout);
-            }
-        }
-
-        partial void OnSelectedDraggableDragModeIndexChanged(int value)
-        {
-            if (TrayIconManager.Default.DesktopFlyout is DraggableFlyout flyout && TryGetValue(DragModes, value, out var dragMode))
-                flyout.DragMode = dragMode;
+                flyout.IsDragMoveEnabled = value;
         }
 
         partial void OnSelectedDraggablePopupPositionIndexChanged(int value)
@@ -289,13 +261,13 @@ namespace DesktopFlyouts
         partial void OnDraggableFlyoutWidthValueChanged(double value)
         {
             if (TrayIconManager.Default.DesktopFlyout is DraggableFlyout flyout)
-                ApplyDraggableFlyoutSize(flyout);
+                flyout.FlyoutWidth = ToGridLength(value);
         }
 
         partial void OnDraggableFlyoutHeightValueChanged(double value)
         {
             if (TrayIconManager.Default.DesktopFlyout is DraggableFlyout flyout)
-                ApplyDraggableFlyoutSize(flyout);
+                flyout.FlyoutHeight = ToGridLength(value);
         }
 
         partial void OnSelectedSeverityPopupPositionIndexChanged(int value)
@@ -387,23 +359,8 @@ namespace DesktopFlyouts
         private void ApplyDraggableFlyoutSettings(DraggableFlyout flyout)
         {
             ApplyPlacement(flyout, SelectedDraggablePopupPositionIndex);
-            if (TryGetValue(IslandLayoutModes, SelectedDraggableIslandLayoutModeIndex, out var layoutMode))
-            {
-                IsDraggableFlyoutSizeEnabled = layoutMode is DesktopFlyoutIslandLayoutMode.Stack;
-                flyout.IslandLayoutMode = layoutMode;
-            }
-
-            ApplyDraggableFlyoutSize(flyout);
-            if (TryGetValue(DragModes, SelectedDraggableDragModeIndex, out var dragMode))
-                flyout.DragMode = dragMode;
-        }
-
-        private void ApplyDraggableFlyoutSize(DraggableFlyout flyout)
-        {
-            if (flyout.IslandLayoutMode is DesktopFlyoutIslandLayoutMode.Freeform)
-                return;
-
             ApplyFlyoutSize(flyout, DraggableFlyoutWidthValue, DraggableFlyoutHeightValue);
+            flyout.IsDragMoveEnabled = IsDragMoveEnabled;
         }
 
         private void ApplySeverityFlyoutSettings(SeverityFlyout flyout)
@@ -440,7 +397,7 @@ namespace DesktopFlyouts
             IndicatorSettingsVisibility = flyoutKind is DesktopFlyoutSampleKind.IndicatorStyle
                 ? Visibility.Visible
                 : Visibility.Collapsed;
-            DraggableSettingsVisibility = flyoutKind is DesktopFlyoutSampleKind.Draggable
+            DragMoveSettingsVisibility = flyoutKind is DesktopFlyoutSampleKind.Draggable
                 ? Visibility.Visible
                 : Visibility.Collapsed;
             SeveritySettingsVisibility = flyoutKind is DesktopFlyoutSampleKind.Severity
@@ -457,7 +414,7 @@ namespace DesktopFlyouts
             {
                 DesktopFlyoutSampleKind.Button => "Demonstrates swipe-to-dismiss, swipe threshold, pressed scale, popup direction, position, and size.",
                 DesktopFlyoutSampleKind.IndicatorStyle => "Demonstrates activation behavior, hide-on-focus-loss behavior, auto close, position, and size.",
-                DesktopFlyoutSampleKind.Draggable => "Demonstrates native window dragging with full-surface and region modes.",
+                DesktopFlyoutSampleKind.Draggable => "Demonstrates moving an open flyout by dragging its desktop host window.",
                 DesktopFlyoutSampleKind.NotificationCenterStyle => "Shows a full-height notification-center style layout.",
                 DesktopFlyoutSampleKind.StartMenuStyle => "Shows a multi-island Start menu style layout.",
                 DesktopFlyoutSampleKind.StickySmallStyle => "Shows a compact flyout opened near the tray icon point.",

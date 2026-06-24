@@ -6,107 +6,80 @@
     xmlns:local="using:DesktopFlyouts"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     ActivationMode="NoActivateOnOpen"
-    DragMode="Region"
+    FlyoutWidth="360"
     HideOnLostFocus="False"
-    IslandLayoutMode="Freeform"
+    IsDragMoveEnabled="True"
     Placement="BottomCenter"
     mc:Ignorable="d">
 
     <local:DesktopFlyout.Islands>
-        <local:DesktopFlyoutIsland
-            CanvasLeft="0"
-            CanvasTop="0"
-            IslandHeight="250"
-            IslandWidth="188">
-            <Grid>
+        <local:DesktopFlyoutIsland IslandHeight="220">
+            <Grid Padding="20" RowSpacing="16">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <local:DesktopFlyoutDragRegion>
-                    <Grid
-                        Height="36"
-                        Padding="12,0"
-                        Background="Gray"
-                        ColumnSpacing="12">
-                        <TextBlock VerticalAlignment="Center" Text="Drag region" />
-                    </Grid>
-                </local:DesktopFlyoutDragRegion>
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                <StackPanel
+                    <Border
+                        Width="40"
+                        Height="40"
+                        Background="{ThemeResource AccentFillColorDefaultBrush}"
+                        CornerRadius="20">
+                        <FontIcon
+                            FontSize="18"
+                            Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}"
+                            Glyph="&#xE7C2;" />
+                    </Border>
+
+                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                        <TextBlock
+                            Style="{StaticResource BodyStrongTextBlockStyle}"
+                            Text="Drag move" />
+                        <TextBlock
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                            Text="DesktopFlyout host window" />
+                    </StackPanel>
+                </Grid>
+
+                <Grid
                     Grid.Row="1"
-                    Margin="12"
                     Padding="16"
                     Background="{ThemeResource FlyoutOverlayBackgroundBrush}"
                     CornerRadius="{StaticResource OverlayCornerRadius}"
-                    Spacing="10">
-                    <Border
-                        Height="14"
-                        HorizontalAlignment="Stretch"
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        CornerRadius="{StaticResource OverlayCornerRadius}" />
-                    <Border
-                        Width="120"
-                        Height="14"
-                        HorizontalAlignment="Left"
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        CornerRadius="{StaticResource OverlayCornerRadius}" />
-                    <Border
-                        Width="92"
-                        Height="14"
-                        HorizontalAlignment="Left"
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        CornerRadius="{StaticResource OverlayCornerRadius}" />
-                </StackPanel>
-            </Grid>
-        </local:DesktopFlyoutIsland>
-        <local:DesktopFlyoutIsland
-            CanvasLeft="300"
-            CanvasTop="400"
-            IslandHeight="250"
-            IslandWidth="188">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+                    RowSpacing="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                <local:DesktopFlyoutDragRegion>
-                    <Grid
-                        Height="36"
-                        Padding="12,0"
-                        Background="Gray"
-                        ColumnSpacing="12">
-                        <TextBlock VerticalAlignment="Center" Text="Drag region" />
-                    </Grid>
-                </local:DesktopFlyoutDragRegion>
-
-                <StackPanel
-                    Grid.Row="1"
-                    Margin="12"
-                    Padding="16"
-                    Background="{ThemeResource FlyoutOverlayBackgroundBrush}"
-                    CornerRadius="{StaticResource OverlayCornerRadius}"
-                    Spacing="10">
                     <Border
-                        Height="14"
-                        HorizontalAlignment="Stretch"
-                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
-                        CornerRadius="{StaticResource OverlayCornerRadius}" />
-                    <Border
-                        Width="120"
-                        Height="14"
+                        Width="180"
+                        Height="16"
                         HorizontalAlignment="Left"
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         CornerRadius="{StaticResource OverlayCornerRadius}" />
                     <Border
-                        Width="92"
-                        Height="14"
+                        Grid.Row="1"
+                        Width="260"
+                        Height="16"
                         HorizontalAlignment="Left"
                         Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                         CornerRadius="{StaticResource OverlayCornerRadius}" />
-                </StackPanel>
+                    <Border
+                        Grid.Row="2"
+                        Width="220"
+                        Height="16"
+                        HorizontalAlignment="Left"
+                        Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                        CornerRadius="{StaticResource OverlayCornerRadius}" />
+                </Grid>
             </Grid>
         </local:DesktopFlyoutIsland>
     </local:DesktopFlyout.Islands>
