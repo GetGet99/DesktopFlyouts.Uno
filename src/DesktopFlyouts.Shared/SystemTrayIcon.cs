@@ -24,7 +24,7 @@ namespace DesktopFlyouts
     /// <see cref="Destroy"/> to remove it. Call <see cref="Dispose()"/> explicitly when the object
     /// is no longer needed to release its owned resources.
     /// </remarks>
-    public unsafe partial class SystemTrayIcon : IDisposable
+    public partial class SystemTrayIcon : IDisposable
     {
         private const uint WM_UNIQUE_MESSAGE = 2048U;
 
@@ -39,10 +39,10 @@ namespace DesktopFlyouts
         private HICON _hIcon;
 
         /// <summary>
-        /// Gets the path to the current icon file, or <see langword="null"/> if the icon was set
+        /// Gets the full path to the current icon file, or <see langword="null"/> if the icon was set
         /// from an existing handle.
         /// </summary>
-        /// <value>The path to an icon file loaded with the Win32 <c>LoadImage</c> API.</value>
+        /// <value>The full path to an icon file loaded with the Win32 <c>LoadImage</c> API.</value>
         public string? IconPath { get; private set; }
 
         private string _Tooltip;
@@ -332,9 +332,8 @@ namespace DesktopFlyouts
         private static HICON LoadIconFromPath(string iconPath)
         {
             if (!File.Exists(iconPath))
-            {
                 throw new FileNotFoundException($"Icon file not found: {iconPath}", iconPath);
-            }
+
             HICON hIcon = (HICON)(void*)PInvoke.LoadImage(
                 HINSTANCE.Null,
                 (PCWSTR)Unsafe.AsPointer(ref Unsafe.AsRef(in iconPath.GetPinnableReference())),

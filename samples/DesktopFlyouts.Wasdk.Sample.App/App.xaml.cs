@@ -3,6 +3,8 @@
 
 using Microsoft.UI.Xaml;
 using System;
+using System.IO;
+using Windows.ApplicationModel;
 
 namespace DesktopFlyouts
 {
@@ -20,7 +22,7 @@ namespace DesktopFlyouts
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
             TrayIconManager.Default.Initialize(new(
-                "Assets\\tray.ico",
+                Path.Combine(Package.Current.InstalledLocation.Path, "Assets\\Tray.ico"),
                 "DesktopFlyouts sample app (WASDK)",
                 new("28DE460A-8BD6-4539-A406-5F685584FD4D")));
 
