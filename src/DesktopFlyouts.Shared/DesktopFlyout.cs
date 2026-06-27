@@ -7,6 +7,7 @@ using System.Drawing;
 using System.Threading.Tasks;
 using Windows.Graphics;
 using FoundationPoint = Windows.Foundation.Point;
+using FoundationRect = Windows.Foundation.Rect;
 using FoundationSize = Windows.Foundation.Size;
 
 #if UWP
@@ -335,7 +336,9 @@ namespace DesktopFlyouts
             IslandsItemsControl.InvalidateMeasure();
         }
 
-        private DesktopFlyoutPopupDirection UpdateFlyoutRegion()
+        private DesktopFlyoutPopupDirection UpdateFlyoutRegion(
+            FoundationRect? resizeAnchorRegion = null,
+            DesktopFlyoutPopupDirection resizePopupDirection = DesktopFlyoutPopupDirection.Vertical)
         {
             if (_host?.DesktopWindowXamlSource is null || IslandsItemsControl is null)
                 return ResolvePopupDirection(PopupDirection, default, WindowHelpers.GetFlyoutWorkAreaRect(_customPlacementBottomCenterPoint));
@@ -371,7 +374,9 @@ namespace DesktopFlyouts
             }
             else
             {
-                (left, top) = GetPlacementOrigin(Placement, regionWidth, regionHeight, workArea);
+                (left, top) = resizeAnchorRegion is FoundationRect anchorRegion
+                    ? GetResizeOrigin(anchorRegion, resizePopupDirection, regionWidth, regionHeight)
+                    : GetPlacementOrigin(Placement, regionWidth, regionHeight, workArea);
             }
 
             left = Clamp(left, workArea.Left, workArea.Right - regionWidth);
@@ -410,7 +415,7 @@ namespace DesktopFlyouts
             UpdateLayout();
             ApplyResolvedFlyoutSize();
             UpdateLayout();
-            _activePopupDirection = UpdateFlyoutRegion();
+            _activePopupDirection = UpdateFlyoutRegion(_host.WindowSize, _activePopupDirection);
             SetOpenTransform();
         }
 
@@ -1188,6 +1193,27 @@ namespace DesktopFlyouts
                 DesktopFlyoutPlacementMode.RightCenter => (workArea.Right - width, workArea.Top + ((workArea.Height - height) / 2)),
                 _ => (workArea.Right - width, workArea.Bottom - height),
             };
+        }
+
+        private static (double Left, double Top) GetResizeOrigin(
+            FoundationRect anchorRegion,
+            DesktopFlyoutPopupDirection popupDirection,
+            double width,
+            double height)
+        {
+            var left = popupDirection is DesktopFlyoutPopupDirection.RightToLeft
+                ? anchorRegion.X + anchorRegion.Width - width
+                : popupDirection is DesktopFlyoutPopupDirection.LeftToRight
+                    ? anchorRegion.X
+                    : anchorRegion.X + ((anchorRegion.Width - width) / 2D);
+
+            var top = popupDirection is DesktopFlyoutPopupDirection.BottomToTop
+                ? anchorRegion.Y + anchorRegion.Height - height
+                : popupDirection is DesktopFlyoutPopupDirection.TopToBottom
+                    ? anchorRegion.Y
+                    : anchorRegion.Y + ((anchorRegion.Height - height) / 2D);
+
+            return (left, top);
         }
 
         private static DesktopFlyoutPopupDirection ResolvePopupDirection(DesktopFlyoutPopupDirection requestedDirection, RectInt32 region, Rectangle workArea)
