@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 using System;
+using Windows.Foundation;
 
 #if UWP
 using Windows.UI.Xaml;
@@ -26,8 +27,13 @@ namespace DesktopFlyouts
 #endif
     public partial class DesktopFlyoutIsland : ContentControl
     {
+        private const double LayoutEpsilon = 0.5D;
+
         private WeakReference<DesktopFlyout>? _owner;
         private long _propertyChangedCallbackTokenForCornerRadiusProperty;
+        private Size _lastActualSize;
+        private Size _lastDesiredSize;
+        private bool _hasLayoutSnapshot;
 
         /// <summary>
         /// Gets an object that provides calculated values that can be referenced from the island template.
@@ -45,6 +51,7 @@ namespace DesktopFlyouts
         {
             DefaultStyleKey = typeof(DesktopFlyoutIsland);
             RegisterPropertyChangedCallback(VisibilityProperty, (s, e) => ((DesktopFlyoutIsland)s).OnIslandVisibilityChanged());
+            LayoutUpdated += DesktopFlyoutIsland_LayoutUpdated;
             UpdateTemplateSettings();
         }
 
@@ -89,6 +96,25 @@ namespace DesktopFlyouts
                 owner.OnIslandVisibilityChanged();
         }
 
+        private void DesktopFlyoutIsland_LayoutUpdated(object? sender, object e)
+        {
+            var actualSize = new Size(ActualWidth, ActualHeight);
+            var desiredSize = DesiredSize;
+            if (_hasLayoutSnapshot &&
+                AreClose(_lastActualSize, actualSize) &&
+                AreClose(_lastDesiredSize, desiredSize))
+            {
+                return;
+            }
+
+            _hasLayoutSnapshot = true;
+            _lastActualSize = actualSize;
+            _lastDesiredSize = desiredSize;
+
+            if (_owner is not null && _owner.TryGetTarget(out var owner))
+                owner.OnIslandLayoutChanged();
+        }
+
         private void UpdateTemplateSettings()
         {
 #if WASDK
@@ -118,6 +144,12 @@ namespace DesktopFlyouts
             TemplateSettings.SystemBackdrop = null;
         }
 #endif
+
+        private static bool AreClose(Size first, Size second)
+        {
+            return Math.Abs(first.Width - second.Width) < LayoutEpsilon &&
+                Math.Abs(first.Height - second.Height) < LayoutEpsilon;
+        }
 
         private void DesktopFlyoutIsland_Unloaded(object sender, RoutedEventArgs e)
         {

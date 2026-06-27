@@ -68,6 +68,7 @@ namespace DesktopFlyouts
         private bool _isSwipeDismissTracking;
         private bool _isSwipeDismissDragging;
         private bool _isFocusManagerGettingFocusSubscribed;
+        private bool _isUpdatingOpenFlyoutLayout;
         private bool _disposed;
 
         private Grid? RootGrid;
@@ -406,17 +407,38 @@ namespace DesktopFlyouts
             UpdateOpenFlyoutLayout();
         }
 
+        internal void OnIslandLayoutChanged()
+        {
+            UpdateOpenFlyoutLayout();
+        }
+
         private void UpdateOpenFlyoutLayout()
         {
-            if (!IsOpen || _isPopupAnimationPlaying || RootGrid is null || _host?.DesktopWindowXamlSource is null)
+            if (!IsOpen ||
+                _isPopupAnimationPlaying ||
+                _isUpdatingOpenFlyoutLayout ||
+                RootGrid is null ||
+                _host?.DesktopWindowXamlSource is null)
+            {
                 return;
+            }
 
-            ResetResolvedFlyoutSize();
-            UpdateLayout();
-            ApplyResolvedFlyoutSize();
-            UpdateLayout();
-            _activePopupDirection = UpdateFlyoutRegion(_host.WindowSize, _activePopupDirection);
-            SetOpenTransform();
+            _isUpdatingOpenFlyoutLayout = true;
+
+            try
+            {
+                ResetResolvedFlyoutSize();
+                MeasureRootGridForAvailableFlyoutSize();
+                ApplyResolvedFlyoutSize();
+                MeasureRootGridForAvailableFlyoutSize();
+                UpdateLayout();
+                _activePopupDirection = UpdateFlyoutRegion(_host.WindowSize, _activePopupDirection);
+                SetOpenTransform();
+            }
+            finally
+            {
+                _isUpdatingOpenFlyoutLayout = false;
+            }
         }
 
         private void ResetResolvedFlyoutSize()
@@ -436,6 +458,15 @@ namespace DesktopFlyouts
             var (availableWidth, availableHeight) = GetAvailableFlyoutSizeInDips();
             RootGrid.Width = ResolveFlyoutLength(FlyoutWidth, availableWidth, HasStarIslandWidth());
             RootGrid.Height = ResolveFlyoutLength(FlyoutHeight, availableHeight, HasStarIslandHeight());
+        }
+
+        private void MeasureRootGridForAvailableFlyoutSize()
+        {
+            if (RootGrid is null)
+                return;
+
+            var (availableWidth, availableHeight) = GetAvailableFlyoutSizeInDips();
+            RootGrid.Measure(new(availableWidth, availableHeight));
         }
 
         private (double Width, double Height) GetAvailableFlyoutSizeInDips()
@@ -1127,12 +1158,30 @@ namespace DesktopFlyouts
 
         private double GetCurrentFlyoutWidth()
         {
-            return RootGrid?.ActualWidth > 0 ? RootGrid.ActualWidth : DesiredSize.Width;
+            return RootGrid is null
+                ? DesiredSize.Width
+                : ResolveCurrentFlyoutLength(RootGrid.Width, RootGrid.DesiredSize.Width, RootGrid.ActualWidth, DesiredSize.Width);
         }
 
         private double GetCurrentFlyoutHeight()
         {
-            return RootGrid?.ActualHeight > 0 ? RootGrid.ActualHeight : DesiredSize.Height;
+            return RootGrid is null
+                ? DesiredSize.Height
+                : ResolveCurrentFlyoutLength(RootGrid.Height, RootGrid.DesiredSize.Height, RootGrid.ActualHeight, DesiredSize.Height);
+        }
+
+        private static double ResolveCurrentFlyoutLength(double explicitLength, double desiredLength, double actualLength, double fallbackLength)
+        {
+            if (!double.IsNaN(explicitLength) && !double.IsInfinity(explicitLength))
+                return explicitLength;
+
+            if (desiredLength > 0)
+                return desiredLength;
+
+            if (actualLength > 0)
+                return actualLength;
+
+            return fallbackLength;
         }
 
         private static double ResolveFlyoutLength(GridLength length, double availableLength, bool stretchWhenAuto)
