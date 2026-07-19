@@ -15,6 +15,7 @@ using Windows.Win32.UI.WindowsAndMessaging;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
+using Windows.Graphics;
 #endif
 
 namespace DesktopFlyouts
@@ -57,7 +58,7 @@ namespace DesktopFlyouts
 
             _host = new XamlIslandHostWindow();
             _host.SetContent(this);
-            _host.UpdateWindowVisibility(false);
+            _ = _host.UpdateWindowVisibility(false);
             _host.SystemSettingsChanged += HostWindow_SystemSettingsChanged;
         }
 
@@ -105,9 +106,9 @@ namespace DesktopFlyouts
 
             UpdateFlyoutTheme();
 
-            _host?.MoveAndResize(new(point.X, point.Y, 0, 0));
-            _host?.SetHWndRectRegion(new(0, 0, 1, 1));
-            _host?.UpdateWindowVisibility(true);
+            _host?.MoveAndResize(new RectInt32() { X = point.X, Y = point.Y });
+            _host?.SetHWndRectRegion(new RectInt32() { Width = 1, Height = 1 });
+            _ = _host?.UpdateWindowVisibility(true);
 
             _menuFlyout.ShowAt(MenuFlyoutTargetControl);
 
@@ -125,7 +126,7 @@ namespace DesktopFlyouts
             if (_disposed)
                 return;
 
-            _host?.UpdateWindowVisibility(false);
+            _ = _host?.UpdateWindowVisibility(false);
 
             _menuFlyout?.Hide();
 
@@ -134,7 +135,7 @@ namespace DesktopFlyouts
 
         private void MenuFlyout_Closed(object? sender, object e)
         {
-            _host?.UpdateWindowVisibility(false);
+            _ = _host?.UpdateWindowVisibility(false);
             IsOpen = false;
         }
 

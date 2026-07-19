@@ -1,0 +1,10 @@
+{
+  "background_color": "#ffffff",
+  "description": "DesktopFlyouts.Uno.Sample.App",
+  "display": "standalone",
+  "name": "DesktopFlyouts.Uno.Sample.App",
+  "short_name": "DesktopFlyouts.Uno.Sample.App",
+  "start_url": "/index.html",
+  "theme_color": "#ffffff",
+  "scope": "/"
+}

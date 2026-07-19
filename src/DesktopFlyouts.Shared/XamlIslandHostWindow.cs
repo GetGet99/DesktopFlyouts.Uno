@@ -1,3 +1,4 @@
+#if !HAS_UNO
 // Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
@@ -193,10 +194,10 @@ namespace DesktopFlyouts
                 PInvoke.DeleteObject(region);
         }
 
-        internal void UpdateWindowVisibility(bool isVisible, bool activate = true)
+        internal ValueTask UpdateWindowVisibility(bool isVisible, bool activate = true)
         {
             if (_disposed)
-                return;
+                return default;
 
             var command = isVisible
                 ? activate ? SHOW_WINDOW_CMD.SW_SHOW : SHOW_WINDOW_CMD.SW_SHOWNOACTIVATE
@@ -222,6 +223,8 @@ namespace DesktopFlyouts
 
             if (isVisible)
                 ApplyActivationModeToWindows();
+
+            return default;
         }
 
         internal void SetActivationMode(DesktopFlyoutActivationMode activationMode)
@@ -657,3 +660,4 @@ namespace DesktopFlyouts
         }
     }
 }
+#endif

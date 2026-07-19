@@ -22,7 +22,7 @@ namespace DesktopFlyouts
     /// <see cref="DesktopFlyout.IslandsOrientation"/>. Put the XAML content for one visual section
     /// in each island.
     /// </remarks>
-#if WASDK
+#if WASDK && !HAS_UNO
     [WinRT.GeneratedBindableCustomProperty([nameof(TemplateSettings)], [])]
 #endif
     public partial class DesktopFlyoutIsland : ContentControl
@@ -71,7 +71,7 @@ namespace DesktopFlyouts
         {
             _owner = new(owner);
 
-#if WASDK
+#if WASDK && !HAS_UNO
             UpdateOwnerBackdrop();
 #endif
         }
@@ -117,7 +117,7 @@ namespace DesktopFlyouts
 
         private void UpdateTemplateSettings()
         {
-#if WASDK
+#if WASDK && !HAS_UNO
             TemplateSettings.BackdropCornerRadius = new(
                 GetBackdropCornerRadius(CornerRadius.TopLeft),
                 GetBackdropCornerRadius(CornerRadius.TopRight),
@@ -126,7 +126,7 @@ namespace DesktopFlyouts
 #endif
         }
 
-#if WASDK
+#if WASDK && !HAS_UNO
         private static double GetBackdropCornerRadius(double cornerRadius)
         {
             return Math.Max(0D, cornerRadius > 0D ? cornerRadius - 1D : 0D);
@@ -153,7 +153,7 @@ namespace DesktopFlyouts
 
         private void DesktopFlyoutIsland_Unloaded(object sender, RoutedEventArgs e)
         {
-#if WASDK
+#if WASDK && !HAS_UNO
             ClearOwnerBackdrop();
 #endif
 

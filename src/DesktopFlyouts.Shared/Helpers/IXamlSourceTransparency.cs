@@ -1,3 +1,4 @@
+#if !HAS_UNO
 // Copyright (c) 0x5BFA. All rights reserved.
 // Licensed under the MIT license.
 
@@ -33,3 +34,4 @@ namespace Windows.UI.Xaml
         HRESULT set_IsBackgroundTransparent([MarshalAs(UnmanagedType.I1)] bool value);
     }
 }
+#endif
