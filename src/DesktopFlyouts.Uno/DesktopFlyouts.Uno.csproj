@@ -42,7 +42,7 @@
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/GetGet99/DesktopFlyouts</RepositoryUrl>
-		<PackageTags>Shell System DesktopFlyouts DesktopFlyout UWP WinUI MUX WASDK WindowsAppSDK Uno Paltform Windows</PackageTags>
+		<PackageTags>Shell System TrayIcon DesktopFlyouts DesktopFlyout UWP WinUI MUX WASDK WindowsAppSDK Uno Paltform X11 Windows</PackageTags>
 		<PackageIcon>icon-128.png</PackageIcon>
   </PropertyGroup>
   
@@ -62,6 +62,10 @@
 		<AdditionalFiles Include="dbus-interfaces\org.freedesktop.DBus.xml"
 			Namespace="DesktopFlyouts.DBus" GenerateDBusTypes="true" />
 		<AdditionalFiles Include="dbus-interfaces\org.freedesktop.portal.Settings.xml"
+			Namespace="DesktopFlyouts.DBus" GenerateDBusTypes="true" />
+		<AdditionalFiles Include="dbus-interfaces\org.kde.StatusNotifierItem.xml"
+			Namespace="DesktopFlyouts.DBus" GenerateDBusTypes="true" DBusGeneratorMode="Handler" />
+		<AdditionalFiles Include="dbus-interfaces\org.kde.StatusNotifierWatcher.xml"
 			Namespace="DesktopFlyouts.DBus" GenerateDBusTypes="true" />
 	</ItemGroup>
 
