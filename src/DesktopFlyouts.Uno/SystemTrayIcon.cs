@@ -1,0 +1,378 @@
+using Tmds.DBus.Protocol;
+using DesktopFlyouts.DBus;
+using SkiaSharp;
+using Svg.Skia;
+
+namespace DesktopFlyouts;
+
+public class SystemTrayIcon : IDisposable
+{
+    readonly string _id;
+    DBusConnection? _connection;
+    DBus.DBus? _dBus;
+    StatusNotifierWatcher? _statusNotifierWatcher;
+    StatusNotifierItemHandler? _sniHandler;
+    IDisposable? _serviceWatchDisposable;
+    string? _sysTrayServiceName;
+    bool _isDisposed;
+    bool _serviceConnected;
+    bool _isVisible = true;
+
+    (int, int, byte[]) _currentIcon = (1, 1, new byte[] { 255, 0, 0, 0 });
+    string _tooltipText = "";
+
+    const int GnomeShellInitialDelayMs = 100;
+    const int GnomeShellSecondDelayMs = 400;
+
+    readonly Dictionary<string, (int Width, int Height, byte[] ArgbData)> _iconCache = new();
+
+    string? _tooltip;
+    string _iconPath;
+
+    public SystemTrayIcon(string iconPath, string? tooltip, string id)
+    {
+        _id = id;
+        _iconPath = iconPath;
+        _tooltip = tooltip;
+        _tooltipText = tooltip ?? "";
+        _ = InitAsync();
+
+        async Task InitAsync()
+        {
+            await InitializeAsync();
+            SetIconImage(iconPath, tooltip);
+            _sniHandler!.ActivationDelegate += OnActivation;
+            _sniHandler!.ContextMenuDelegate += OnContextMenu;
+            _sniHandler!.SecondaryActivateDelegate += OnSecondaryActivate;
+            _sniHandler!.ScrollDelegate += OnScroll;
+        }
+    }
+
+    void OnActivation(int x, int y)
+    {
+        LeftClicked?.Invoke(this, new MouseEventReceivedEventArgs(new(x, y)));
+    }
+
+    void OnContextMenu(int x, int y)
+    {
+        RightClicked?.Invoke(this, new MouseEventReceivedEventArgs(new(x, y)));
+    }
+
+    void OnSecondaryActivate(int x, int y)
+    {
+        MiddleClicked?.Invoke(this, new MouseEventReceivedEventArgs(new(x, y)));
+    }
+
+    void OnScroll(int delta, string orientation)
+    {
+        Scrolled?.Invoke(this, new MouseScrollEventReceivedEventArgs(delta, orientation));
+    }
+
+    // ─── Public API ────────────────────────────────────────────────
+
+    public string? Tooltip
+    {
+        get => _tooltip;
+        set
+        {
+            _tooltip = value;
+            SetIconImage(_iconPath, _tooltip);
+        }
+    }
+
+    public string IconPath => _iconPath;
+
+    public void SetIcon(string iconPath)
+    {
+        _iconPath = iconPath;
+        SetIconImage(iconPath, _tooltip);
+    }
+
+    public void Show()
+    {
+        if (_isDisposed)
+            throw new ObjectDisposedException(nameof(SystemTrayIcon));
+
+        _isVisible = true;
+        if (_serviceConnected)
+            _ = CreateTrayIconAsync();
+    }
+
+    public void Destroy()
+    {
+        if (_isDisposed)
+            throw new ObjectDisposedException(nameof(SystemTrayIcon));
+
+        _isVisible = false;
+        DestroyTrayIcon();
+    }
+
+    public void Dispose()
+    {
+        if (_isDisposed)
+            return;
+
+        _isDisposed = true;
+        _isVisible = false;
+
+        DestroyTrayIcon();
+
+        _serviceWatchDisposable?.Dispose();
+        _connection?.Dispose();
+    }
+
+    ~SystemTrayIcon() => Dispose();
+
+    public bool IsVisible
+    {
+        get => _isVisible;
+        set
+        {
+            if (value) Show();
+            else Destroy();
+        }
+    }
+
+    public string Id => _id;
+
+    public event EventHandler<MouseEventReceivedEventArgs>? LeftClicked;
+    public event EventHandler<MouseEventReceivedEventArgs>? RightClicked;
+    public event EventHandler<MouseEventReceivedEventArgs>? MiddleClicked;
+    public event EventHandler<MouseScrollEventReceivedEventArgs>? Scrolled;
+    // Linux does not have this
+    // public event EventHandler<MouseEventReceivedEventArgs>? LeftDoubleClicked;
+    // public event EventHandler<MouseEventReceivedEventArgs>? RightDoubleClicked;
+
+    // ─── D-Bus Initialization ─────────────────────────────────────
+
+    async Task InitializeAsync(CancellationToken cancellationToken = default)
+    {
+        if (_isDisposed)
+            throw new ObjectDisposedException(nameof(SystemTrayIcon));
+
+        _connection = new DBusConnection(DBusAddress.Session!);
+        await _connection.ConnectAsync();
+
+        _dBus = new(_connection, "org.freedesktop.DBus", "/org/freedesktop/DBus");
+
+        _sniHandler = new StatusNotifierItemHandler(_connection, _id, _id);
+
+        _isVisible = true;
+
+        await WatchAsync(cancellationToken);
+    }
+
+    async Task WatchAsync(CancellationToken cancellationToken)
+    {
+        try
+        {
+            _serviceWatchDisposable = await _dBus!.WatchNameOwnerChangedAsync(
+                change =>
+                {
+                    if (change.A0 == "org.kde.StatusNotifierWatcher")
+                        OnNameChange(change.A0, change.A2);
+                },
+                emitOnCapturedContext: false);
+
+            var nameOwner = await _dBus.GetNameOwnerAsync("org.kde.StatusNotifierWatcher");
+            OnNameChange("org.kde.StatusNotifierWatcher", nameOwner);
+        }
+        catch (DBusErrorReplyException ex) when (ex.ErrorName == "org.freedesktop.DBus.Error.NameHasNoOwner")
+        {
+        }
+        catch
+        {
+            _serviceWatchDisposable = null;
+        }
+    }
+
+    void OnNameChange(string name, string? newOwner)
+    {
+        if (_isDisposed || _connection is null || name != "org.kde.StatusNotifierWatcher")
+            return;
+
+        if (!_serviceConnected && newOwner is not null)
+        {
+            _serviceConnected = true;
+            _statusNotifierWatcher = new StatusNotifierWatcher(_connection, "org.kde.StatusNotifierWatcher", "/StatusNotifierWatcher");
+
+            DestroyTrayIcon();
+
+            if (_isVisible)
+                _ = CreateTrayIconAsync();
+        }
+        else if (_serviceConnected && newOwner is null)
+        {
+            DestroyTrayIcon();
+            _serviceConnected = false;
+        }
+    }
+
+    async Task CreateTrayIconAsync()
+    {
+        if (_connection is null || !_serviceConnected || _isDisposed || _statusNotifierWatcher is null)
+            return;
+
+        try
+        {
+            _connection.RemoveMethodHandler(_sniHandler!.Path);
+            _connection.AddMethodHandler(_sniHandler);
+
+            await RegisterWithStatusNotifierWatcherAsync();
+
+            ReEmitSignalsForGnomeShellAsync();
+        }
+        catch
+        {
+        }
+    }
+
+    async Task RegisterWithStatusNotifierWatcherAsync()
+    {
+        _sysTrayServiceName = _connection!.UniqueName!;
+
+        try
+        {
+            await _statusNotifierWatcher!.RegisterStatusNotifierItemAsync(_sysTrayServiceName);
+        }
+        catch
+        {
+            throw;
+        }
+
+        _sniHandler!.SetTitleAndTooltip(_tooltipText);
+        _sniHandler.SetIcon(_currentIcon);
+    }
+
+    void ReEmitSignalsForGnomeShellAsync()
+    {
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(GnomeShellInitialDelayMs);
+            if (!_isDisposed && _sniHandler?.Connection is not null)
+                _sniHandler.SetIcon(_currentIcon);
+
+            await Task.Delay(GnomeShellSecondDelayMs);
+            if (!_isDisposed && _sniHandler?.Connection is not null)
+                _sniHandler.SetIcon(_currentIcon);
+        });
+    }
+
+    void DestroyTrayIcon()
+    {
+        if (_connection is null || !_serviceConnected || _isDisposed || _sniHandler is null || _sysTrayServiceName is null)
+            return;
+
+        try
+        {
+            _connection.RemoveMethodHandler(_sniHandler.Path);
+        }
+        catch
+        {
+        }
+    }
+
+    // ─── Icon Management ──────────────────────────────────────────
+
+    void SetIconImage(string iconPath, string? tooltip = null)
+    {
+        if (_isDisposed)
+            throw new ObjectDisposedException(nameof(SystemTrayIcon));
+
+        var pixmap = GetOrRenderIcon(iconPath);
+        _currentIcon = pixmap;
+        _tooltipText = tooltip ?? _tooltipText;
+
+        if (_sniHandler?.Connection is not null)
+        {
+            _sniHandler.SetIcon(_currentIcon);
+            if (tooltip is not null)
+                _sniHandler.SetTitleAndTooltip(tooltip);
+        }
+    }
+
+    // ─── Icon Rendering ───────────────────────────────────────────
+
+    (int width, int height, byte[] argbData) GetOrRenderIcon(string path, int size = 48)
+    {
+        var key = $"{path}:{size}";
+        if (_iconCache.TryGetValue(key, out var cached))
+            return cached;
+
+        var rendered = RenderIcon(path, size);
+        _iconCache[key] = rendered;
+        return rendered;
+    }
+
+    static (int width, int height, byte[] argbData) RenderIcon(string path, int size = 48)
+    {
+        if (!File.Exists(path))
+            throw new FileNotFoundException($"Icon file not found: {path}");
+
+        try
+        {
+            using var svg = new SKSvg();
+            if (svg.Load(path) is { } picture)
+            {
+                using var bitmap = RenderSvgToBitmap(picture, size);
+                return ConvertToArgb(bitmap);
+            }
+        }
+        catch
+        {
+        }
+
+        using var src = SKBitmap.Decode(path)
+            ?? throw new InvalidOperationException($"Failed to decode image: {path}");
+
+        using var scaled = ScaleBitmap(src, size);
+        return ConvertToArgb(scaled);
+    }
+
+    static SKBitmap RenderSvgToBitmap(SKPicture picture, int size)
+    {
+        var bounds = picture.CullRect;
+        var scale = Math.Min(size / bounds.Width, size / bounds.Height);
+        var width = Math.Max(1, (int)(bounds.Width * scale));
+        var height = Math.Max(1, (int)(bounds.Height * scale));
+
+        var bitmap = new SKBitmap(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
+        using var canvas = new SKCanvas(bitmap);
+        canvas.Clear(SKColors.Transparent);
+        canvas.Scale(scale);
+        canvas.DrawPicture(picture);
+        return bitmap;
+    }
+
+    static SKBitmap ScaleBitmap(SKBitmap source, int size)
+    {
+        var scale = Math.Min((float)size / source.Width, (float)size / source.Height);
+        var width = Math.Max(1, (int)(source.Width * scale));
+        var height = Math.Max(1, (int)(source.Height * scale));
+
+        var bitmap = new SKBitmap(width, height, SKColorType.Rgba8888, SKAlphaType.Premul);
+        using var canvas = new SKCanvas(bitmap);
+        canvas.Clear(SKColors.Transparent);
+        canvas.DrawBitmap(source, new SKRect(0, 0, width, height));
+        return bitmap;
+    }
+
+    static (int width, int height, byte[] argbData) ConvertToArgb(SKBitmap bitmap)
+    {
+        var width = bitmap.Width;
+        var height = bitmap.Height;
+        var pixels = bitmap.Bytes;
+        var argbData = new byte[width * height * 4];
+
+        for (int i = 0; i < width * height; i++)
+        {
+            var srcIdx = i * 4;
+            argbData[srcIdx] = pixels[srcIdx + 3];
+            argbData[srcIdx + 1] = pixels[srcIdx];
+            argbData[srcIdx + 2] = pixels[srcIdx + 1];
+            argbData[srcIdx + 3] = pixels[srcIdx + 2];
+        }
+
+        return (width, height, argbData);
+    }
+}
