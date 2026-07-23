@@ -6,6 +6,16 @@ using Svg.Skia;
 
 namespace DesktopFlyouts;
 
+/// <summary>
+/// Provides functionality for displaying and managing a system tray icon on Linux via D-Bus StatusNotifierItem.
+/// </summary>
+/// <remarks>
+/// <see cref="SystemTrayIcon"/> wraps the StatusNotifierItem D-Bus protocol and raises click events
+/// with screen coordinates that can be passed to the point-based flyout and menu show methods.
+/// Call <see cref="Show"/> to register the icon with the StatusNotifierWatcher and
+/// <see cref="Destroy"/> to remove it. Call <see cref="Dispose()"/> explicitly when the object
+/// is no longer needed to release its owned resources.
+/// </remarks>
 public class SystemTrayIcon : IDisposable
 {
     readonly string _id;
@@ -30,6 +40,17 @@ public class SystemTrayIcon : IDisposable
     string? _tooltip;
     string _iconPath;
 
+    /// <summary>
+    /// Initializes a new instance of <see cref="SystemTrayIcon"/> with an icon loaded from a
+    /// file path.
+    /// </summary>
+    /// <param name="iconPath">The path to the icon file.</param>
+    /// <param name="tooltip">The tooltip text.</param>
+    /// <param name="id">The stable identifier for the tray icon.</param>
+    /// <remarks>
+    /// Construction prepares the icon resources and begins D-Bus initialization. The
+    /// icon is not registered with the StatusNotifierWatcher until <see cref="Show"/> is called.
+    /// </remarks>
     public SystemTrayIcon(string iconPath, string? tooltip, string id)
     {
         ThrowHelper.ThrowIfNotLinux();
@@ -75,6 +96,14 @@ public class SystemTrayIcon : IDisposable
 
     // ─── Public API ────────────────────────────────────────────────
 
+    /// <summary>
+    /// Gets or sets the tooltip text shown for the tray icon.
+    /// </summary>
+    /// <value>The tray icon tooltip text.</value>
+    /// <remarks>
+    /// If the tray icon is already registered with the StatusNotifierWatcher, setting this property
+    /// updates it immediately. Otherwise, the value is recorded and applied when <see cref="Show"/> is called.
+    /// </remarks>
     public string? Tooltip
     {
         get => _tooltip;
@@ -85,14 +114,32 @@ public class SystemTrayIcon : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the full path to the current icon file.
+    /// </summary>
+    /// <value>The full path to an icon file.</value>
     public string IconPath => _iconPath;
 
+    /// <summary>
+    /// Replaces the current icon with one loaded from a file path.
+    /// </summary>
+    /// <param name="iconPath">The path to the icon file.</param>
+    /// <exception cref="FileNotFoundException">
+    /// Thrown when <paramref name="iconPath"/> cannot be found or loaded as an icon file.
+    /// </exception>
     public void SetIcon(string iconPath)
     {
         _iconPath = iconPath;
         SetIconImage(iconPath, _tooltip);
     }
-    
+
+    /// <summary>
+    /// Makes the tray icon visible and synchronizes its state to the StatusNotifierWatcher.
+    /// </summary>
+    /// <remarks>
+    /// If the tray icon has not yet been registered, this method registers it. If it
+    /// already exists, this method updates its current state.
+    /// </remarks>
     public void Show()
     {
         if (_isDisposed)
@@ -103,6 +150,13 @@ public class SystemTrayIcon : IDisposable
             _ = CreateTrayIconAsync();
     }
 
+    /// <summary>
+    /// Removes the tray icon from the StatusNotifierWatcher.
+    /// </summary>
+    /// <remarks>
+    /// This method is safe to call multiple times. It does not dispose the
+    /// <see cref="SystemTrayIcon"/> object; call <see cref="Dispose()"/> to release all resources.
+    /// </remarks>
     public void Destroy()
     {
         if (_isDisposed)
@@ -112,6 +166,14 @@ public class SystemTrayIcon : IDisposable
         DestroyTrayIcon();
     }
 
+    /// <summary>
+    /// Releases the resources held by this <see cref="SystemTrayIcon"/>.
+    /// </summary>
+    /// <remarks>
+    /// Call this method explicitly when the instance is no longer needed. If the tray icon is
+    /// still registered, it is removed first. The D-Bus connection and associated watches are
+    /// disposed. After disposal, the instance should not be used again.
+    /// </remarks>
     public void Dispose()
     {
         if (_isDisposed)
@@ -128,6 +190,16 @@ public class SystemTrayIcon : IDisposable
 
     ~SystemTrayIcon() => Dispose();
 
+    /// <summary>
+    /// Gets or sets whether the tray icon is visible.
+    /// </summary>
+    /// <value><see langword="true"/> if the tray icon is visible; otherwise,
+    /// <see langword="false"/>. The default is <see langword="true"/>.</value>
+    /// <remarks>
+    /// If the tray icon is already registered with the StatusNotifierWatcher, setting this property
+    /// updates the icon state immediately. Otherwise, the value is recorded and applied when
+    /// <see cref="Show"/> is called.
+    /// </remarks>
     public bool IsVisible
     {
         get => _isVisible;
@@ -138,11 +210,42 @@ public class SystemTrayIcon : IDisposable
         }
     }
 
+    /// <summary>
+    /// Gets the stable identifier used for the tray icon.
+    /// </summary>
+    /// <value>The identifier used by the StatusNotifierWatcher to identify this notification icon.</value>
     public string Id => _id;
 
+    /// <summary>
+    /// Occurs when the tray icon receives a left-click (activation).
+    /// </summary>
+    /// <remarks>
+    /// The event argument contains the center point of the tray icon in physical screen pixels.
+    /// </remarks>
     public event EventHandler<MouseEventReceivedEventArgs>? LeftClicked;
+
+    /// <summary>
+    /// Occurs when the tray icon receives a right-click (context menu).
+    /// </summary>
+    /// <remarks>
+    /// The event argument contains the center point of the tray icon in physical screen pixels.
+    /// </remarks>
     public event EventHandler<MouseEventReceivedEventArgs>? RightClicked;
+
+    /// <summary>
+    /// Occurs when the tray icon receives a middle-click (secondary activation).
+    /// </summary>
+    /// <remarks>
+    /// The event argument contains the center point of the tray icon in physical screen pixels.
+    /// </remarks>
     public event EventHandler<MouseEventReceivedEventArgs>? MiddleClicked;
+
+    /// <summary>
+    /// Occurs when the tray icon receives a scroll event.
+    /// </summary>
+    /// <remarks>
+    /// The event argument contains the scroll delta and orientation.
+    /// </remarks>
     public event EventHandler<MouseScrollEventReceivedEventArgs>? Scrolled;
     // Linux does not have this
     // public event EventHandler<MouseEventReceivedEventArgs>? LeftDoubleClicked;
