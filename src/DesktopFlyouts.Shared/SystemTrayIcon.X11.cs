@@ -30,14 +30,11 @@ public class SystemTrayIcon : IDisposable
     bool _isVisible = true;
 
     (int, int, byte[]) _currentIcon = (1, 1, new byte[] { 255, 0, 0, 0 });
-    string _tooltipText = "";
 
     const int GnomeShellInitialDelayMs = 100;
     const int GnomeShellSecondDelayMs = 400;
 
-    readonly Dictionary<string, (int Width, int Height, byte[] ArgbData)> _iconCache = new();
-
-    string? _tooltip;
+    string _tooltip;
     string _iconPath;
 
     /// <summary>
@@ -51,19 +48,18 @@ public class SystemTrayIcon : IDisposable
     /// Construction prepares the icon resources and begins D-Bus initialization. The
     /// icon is not registered with the StatusNotifierWatcher until <see cref="Show"/> is called.
     /// </remarks>
-    public SystemTrayIcon(string iconPath, string? tooltip, string id)
+    public SystemTrayIcon(string iconPath, string tooltip, string id)
     {
         ThrowHelper.ThrowIfNotLinux();
         _id = id;
         _iconPath = iconPath;
         _tooltip = tooltip;
-        _tooltipText = tooltip ?? "";
         _ = InitAsync();
 
         async Task InitAsync()
         {
             await InitializeAsync();
-            SetIconImage(iconPath, tooltip);
+            UpdateIcon(iconPath);
             _sniHandler!.ActivationDelegate += OnActivation;
             _sniHandler!.ContextMenuDelegate += OnContextMenu;
             _sniHandler!.SecondaryActivateDelegate += OnSecondaryActivate;
@@ -104,13 +100,17 @@ public class SystemTrayIcon : IDisposable
     /// If the tray icon is already registered with the StatusNotifierWatcher, setting this property
     /// updates it immediately. Otherwise, the value is recorded and applied when <see cref="Show"/> is called.
     /// </remarks>
-    public string? Tooltip
+    public string Tooltip
     {
         get => _tooltip;
         set
         {
+            if (_isDisposed)
+                throw new ObjectDisposedException(nameof(SystemTrayIcon));
+
             _tooltip = value;
-            SetIconImage(_iconPath, _tooltip);
+            if (_sniHandler?.Connection is not null)
+                _sniHandler.SetTitleAndTooltip(value ?? "");
         }
     }
 
@@ -130,7 +130,7 @@ public class SystemTrayIcon : IDisposable
     public void SetIcon(string iconPath)
     {
         _iconPath = iconPath;
-        SetIconImage(iconPath, _tooltip);
+        UpdateIcon(iconPath);
     }
 
     /// <summary>
@@ -348,7 +348,7 @@ public class SystemTrayIcon : IDisposable
             throw;
         }
 
-        _sniHandler!.SetTitleAndTooltip(_tooltipText);
+        _sniHandler!.SetTitleAndTooltip(_tooltip);
         _sniHandler.SetIcon(_currentIcon);
     }
 
@@ -382,35 +382,18 @@ public class SystemTrayIcon : IDisposable
 
     // ─── Icon Management ──────────────────────────────────────────
 
-    void SetIconImage(string iconPath, string? tooltip = null)
+    void UpdateIcon(string iconPath)
     {
         if (_isDisposed)
             throw new ObjectDisposedException(nameof(SystemTrayIcon));
 
-        var pixmap = GetOrRenderIcon(iconPath);
-        _currentIcon = pixmap;
-        _tooltipText = tooltip ?? _tooltipText;
+        _currentIcon = RenderIcon(iconPath);
 
         if (_sniHandler?.Connection is not null)
-        {
             _sniHandler.SetIcon(_currentIcon);
-            if (tooltip is not null)
-                _sniHandler.SetTitleAndTooltip(tooltip);
-        }
     }
 
     // ─── Icon Rendering ───────────────────────────────────────────
-
-    (int width, int height, byte[] argbData) GetOrRenderIcon(string path, int size = 48)
-    {
-        var key = $"{path}:{size}";
-        if (_iconCache.TryGetValue(key, out var cached))
-            return cached;
-
-        var rendered = RenderIcon(path, size);
-        _iconCache[key] = rendered;
-        return rendered;
-    }
 
     static (int width, int height, byte[] argbData) RenderIcon(string path, int size = 48)
     {
