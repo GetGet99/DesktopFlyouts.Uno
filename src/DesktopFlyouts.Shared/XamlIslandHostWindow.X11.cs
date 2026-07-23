@@ -179,8 +179,12 @@ internal partial class XamlIslandHostWindow : IDisposable
         if (_display is 0 || _x11Window is 0)
             return;
 
+        // Ensure the window has a minimum size of 1x1 — X11 rejects 0-dimension windows with BadValue.
+        var safeWidth = Math.Max(1, rect.Width);
+        var safeHeight = Math.Max(1, rect.Height);
+
         // Use AppWindow.Resize to notify the Skia rendering pipeline of the new size.
-        _window.AppWindow.Resize(new SizeInt32 { Width = rect.Width, Height = rect.Height });
+        _window.AppWindow.Resize(new SizeInt32 { Width = safeWidth, Height = safeHeight });
 
         // Use raw X11 for positioning to avoid Uno's pipeline re-reading the WM-overridden position.
         XMoveWindow(_display, _x11Window, rect.X, rect.Y);
