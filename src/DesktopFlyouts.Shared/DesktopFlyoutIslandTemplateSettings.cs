@@ -20,7 +20,7 @@ namespace DesktopFlyouts
     /// </remarks>
     public partial class DesktopFlyoutIslandTemplateSettings : DependencyObject
     {
-#if WASDK
+#if WASDK && !HAS_UNO
         /// <summary>
         /// Gets the corner radius used by backdrop elements inside the island template.
         /// </summary>

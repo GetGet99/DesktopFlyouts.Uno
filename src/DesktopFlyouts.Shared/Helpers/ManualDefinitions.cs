@@ -1,3 +1,4 @@
+#if !HAS_UNO
 // Copyright (c) Files Community
 // Licensed under the MIT License.
 
@@ -55,3 +56,4 @@ namespace Windows.Win32
         }
     }
 }
+#endif

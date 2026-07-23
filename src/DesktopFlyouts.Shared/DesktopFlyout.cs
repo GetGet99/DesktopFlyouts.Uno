@@ -86,7 +86,7 @@ namespace DesktopFlyouts
 
             _host = new XamlIslandHostWindow();
             _host.SetContent(this);
-            _host.UpdateWindowVisibility(false);
+            _ = _host.UpdateWindowVisibility(false);
             _host.WindowInactivated += HostWindow_Inactivated;
             _host.SystemSettingsChanged += HostWindow_SystemSettingsChanged;
         }
@@ -184,7 +184,7 @@ namespace DesktopFlyouts
                     UpdateLayout();
                     await Task.Delay(1);
 
-                    _host.UpdateWindowVisibility(true, shouldActivateOnOpen);
+                    await _host.UpdateWindowVisibility(true, shouldActivateOnOpen);
                     if (!shouldActivateOnOpen)
                         RestartRestoreActivationTimer();
 
@@ -232,7 +232,7 @@ namespace DesktopFlyouts
             Hide(false);
         }
 
-#if WASDK
+#if WASDK && !HAS_UNO
         internal SystemBackdrop? CreateIslandSystemBackdrop()
         {
             if (!IsBackdropEnabled)
@@ -317,7 +317,7 @@ namespace DesktopFlyouts
 
         private void UpdateIslandBackdrops()
         {
-#if WASDK
+#if WASDK && !HAS_UNO
             foreach (var island in Islands)
                 island.UpdateOwnerBackdrop();
 #endif
@@ -383,14 +383,10 @@ namespace DesktopFlyouts
             left = Clamp(left, workArea.Left, workArea.Right - regionWidth);
             top = Clamp(top, workArea.Top, workArea.Bottom - regionHeight);
 
-            var region = new RectInt32(
-                (int)Math.Round(left),
-                (int)Math.Round(top),
-                (int)regionWidth,
-                (int)regionHeight);
+            var region = new RectInt32() { X = (int)Math.Round(left), Y = (int)Math.Round(top), Width = (int)regionWidth, Height = (int)regionHeight };
 
             _host.MoveAndResize(region, ShouldActivateOnOpen());
-            _host.SetHWndRectRegion(new(0, 0, region.Width, region.Height));
+            _host.SetHWndRectRegion(new RectInt32() { Width = region.Width, Height = region.Height });
 
             return ResolvePopupDirection(requestedPopupDirection, region, workArea);
         }
@@ -553,7 +549,7 @@ namespace DesktopFlyouts
             SetClosedTransform(_activePopupDirection);
             _isPopupAnimationPlaying = false;
             IsOpen = false;
-            _host?.UpdateWindowVisibility(false);
+            _ = _host?.UpdateWindowVisibility(false);
         }
 
         private void PrepareInitialFocus()

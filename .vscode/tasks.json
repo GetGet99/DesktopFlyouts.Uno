@@ -1,0 +1,31 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build-uno-desktop",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "build",
+        "${workspaceFolder}/samples/DesktopFlyouts.Uno.Sample.App/DesktopFlyouts.Uno.Sample.App.csproj",
+        "/property:GenerateFullPaths=true",
+        "/property:TargetFramework=net10.0-desktop",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    },
+    {
+      "label": "publish-uno-desktop",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "publish",
+        "${workspaceFolder}/samples/DesktopFlyouts.Uno.Sample.App/DesktopFlyouts.Uno.Sample.App.csproj",
+        "/property:GenerateFullPaths=true",
+        "/property:TargetFramework=net10.0-desktop",
+        "/consoleloggerparameters:NoSummary"
+      ],
+      "problemMatcher": "$msCompile"
+    }
+  ]
+}
