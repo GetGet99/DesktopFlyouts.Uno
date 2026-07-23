@@ -28,5 +28,6 @@
 
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" />
+    <PackageReference Include="GTrayIcon.Linux" />
   </ItemGroup>
 </Project>

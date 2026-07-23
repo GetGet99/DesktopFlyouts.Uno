@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using Windows.Foundation;
+using GTrayIcon.Linux;
 
 namespace DesktopFlyouts;
 
@@ -9,6 +10,7 @@ internal partial class TrayIconManager : IDisposable
     private static readonly Lazy<TrayIconManager> _default = new(() => new TrayIconManager());
     internal static TrayIconManager Default => _default.Value;
 
+    internal SystemTrayIcon? SystemTrayIcon { get; set; }
     internal DesktopFlyout? DesktopFlyout { get; set; }
     internal DesktopMenuFlyout? DesktopMenuFlyout { get; set; }
     internal DesktopFlyoutSampleKind SelectedFlyoutExample { get; private set; }
@@ -17,12 +19,18 @@ internal partial class TrayIconManager : IDisposable
 
     private TrayIconManager() { }
 
-    internal void Initialize()
+    internal void Initialize(SystemTrayIcon trayIcon)
     {
         Debug.WriteLine("[TrayIconManager] Initialize called.");
         DesktopFlyout = CreateFlyout(SelectedFlyoutExample);
         Debug.WriteLine($"[TrayIconManager] Created flyout: {DesktopFlyout?.GetType().Name}");
         DesktopMenuFlyout = new MainDesktopMenuFlyout();
+
+        SystemTrayIcon = trayIcon;
+        SystemTrayIcon.Show();
+        Debug.WriteLine("[TrayIconManager] SystemTrayIcon.Show() called.");
+        SystemTrayIcon.LeftClicked += SystemTrayIcon_LeftClicked;
+        SystemTrayIcon.RightClicked += SystemTrayIcon_RightClicked;
     }
 
     internal void SwitchFlyout(DesktopFlyoutSampleKind example)
@@ -54,7 +62,7 @@ internal partial class TrayIconManager : IDisposable
         };
     }
 
-    internal void ToggleFlyout(Point? point = null)
+    internal void ToggleFlyout(Windows.Foundation.Point? point = null)
     {
         Debug.WriteLine($"[TrayIconManager] ToggleFlyout called. point={point}, flyout={DesktopFlyout?.GetType().Name}, isOpen={DesktopFlyout?.IsOpen}");
         if (DesktopFlyout is null)
@@ -77,6 +85,24 @@ internal partial class TrayIconManager : IDisposable
         }
     }
 
+    private void SystemTrayIcon_LeftClicked(object? sender, MouseEventReceivedEventArgs e)
+    {
+        Debug.WriteLine($"[TrayIconManager] LeftClicked at ({e.Point.X}, {e.Point.Y})");
+        ToggleFlyout(new((int)e.Point.X, (int)e.Point.Y));
+    }
+
+    private void SystemTrayIcon_RightClicked(object? sender, MouseEventReceivedEventArgs e)
+    {
+        Debug.WriteLine($"[TrayIconManager] RightClicked at ({e.Point.X}, {e.Point.Y})");
+        if (DesktopMenuFlyout is null)
+            return;
+
+        if (DesktopMenuFlyout.IsOpen)
+            DesktopMenuFlyout.Hide();
+
+        DesktopMenuFlyout.Show(new(e.Point.X, e.Point.Y - 32));
+    }
+
     public void Dispose()
     {
         if (_disposed)
@@ -84,9 +110,13 @@ internal partial class TrayIconManager : IDisposable
 
         _disposed = true;
 
+        SystemTrayIcon?.LeftClicked -= SystemTrayIcon_LeftClicked;
+        SystemTrayIcon?.RightClicked -= SystemTrayIcon_RightClicked;
+        SystemTrayIcon?.Dispose();
         DesktopFlyout?.Dispose();
         DesktopMenuFlyout?.Dispose();
 
+        SystemTrayIcon = null;
         DesktopFlyout = null;
         DesktopMenuFlyout = null;
 
