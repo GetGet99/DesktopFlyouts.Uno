@@ -1,11 +1,12 @@
+#if DESKTOP
 using Tmds.DBus.Protocol;
 using DesktopFlyouts.DBus;
 
 namespace DesktopFlyouts;
 
-class StatusNotifierItemHandler : DBusHandler, IStatusNotifierItemHandler, IStatusNotifierItemProperties
+class X11StatusNotifierItemHandler : DBusHandler, IStatusNotifierItemHandler, IStatusNotifierItemProperties
 {
-    public StatusNotifierItemHandler(DBusConnection connection, string id, string title)
+    public X11StatusNotifierItemHandler(DBusConnection connection, string id, string title)
         : base(connection, path: "/StatusNotifierItem", handlesChildPaths: false)
     {
         Category = "ApplicationStatus";
@@ -118,3 +119,4 @@ class StatusNotifierItemHandler : DBusHandler, IStatusNotifierItemHandler, IStat
     public string AttentionMovieName { get; set; }
     public (string, (int, int, byte[])[], string, string) ToolTip { get; set; }
 }
+#endif

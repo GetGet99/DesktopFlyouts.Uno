@@ -1,3 +1,4 @@
+#if DESKTOP
 using Tmds.DBus.Protocol;
 using DesktopFlyouts.DBus;
 using SkiaSharp;
@@ -11,7 +12,7 @@ public class SystemTrayIcon : IDisposable
     DBusConnection? _connection;
     DBus.DBus? _dBus;
     StatusNotifierWatcher? _statusNotifierWatcher;
-    StatusNotifierItemHandler? _sniHandler;
+    X11StatusNotifierItemHandler? _sniHandler;
     IDisposable? _serviceWatchDisposable;
     string? _sysTrayServiceName;
     bool _isDisposed;
@@ -31,6 +32,7 @@ public class SystemTrayIcon : IDisposable
 
     public SystemTrayIcon(string iconPath, string? tooltip, string id)
     {
+        ThrowHelper.ThrowIfNotLinux();
         _id = id;
         _iconPath = iconPath;
         _tooltip = tooltip;
@@ -65,7 +67,10 @@ public class SystemTrayIcon : IDisposable
 
     void OnScroll(int delta, string orientation)
     {
-        Scrolled?.Invoke(this, new MouseScrollEventReceivedEventArgs(delta, orientation));
+        Scrolled?.Invoke(this, new MouseScrollEventReceivedEventArgs(
+            delta,
+            orientation == "horizontal" ? MouseScrollOrientation.Horizontal : MouseScrollOrientation.Vertical
+        ));
     }
 
     // ─── Public API ────────────────────────────────────────────────
@@ -87,7 +92,7 @@ public class SystemTrayIcon : IDisposable
         _iconPath = iconPath;
         SetIconImage(iconPath, _tooltip);
     }
-
+    
     public void Show()
     {
         if (_isDisposed)
@@ -155,7 +160,7 @@ public class SystemTrayIcon : IDisposable
 
         _dBus = new(_connection, "org.freedesktop.DBus", "/org/freedesktop/DBus");
 
-        _sniHandler = new StatusNotifierItemHandler(_connection, _id, _id);
+        _sniHandler = new X11StatusNotifierItemHandler(_connection, _id, _id);
 
         _isVisible = true;
 
@@ -376,3 +381,4 @@ public class SystemTrayIcon : IDisposable
         return (width, height, argbData);
     }
 }
+#endif
