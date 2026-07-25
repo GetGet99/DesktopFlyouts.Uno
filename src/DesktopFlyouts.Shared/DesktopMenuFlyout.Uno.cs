@@ -34,6 +34,7 @@ namespace DesktopFlyouts
         private const string PART_MenuFlyoutTargetControl = "PART_MenuFlyoutTargetControl";
 
         private readonly XamlIslandHostWindow? _host;
+        private readonly List<MenuFlyoutItem> _subscribedItems = new();
         private MenuFlyoutPresenter? _presenter;
         private bool _disposed;
         private bool _isShowPending;
@@ -94,6 +95,50 @@ namespace DesktopFlyouts
                 _presenter.Items.Add((MenuFlyoutItemBase)item);
         }
 
+        private void SubscribeItemClicks()
+        {
+            if (_presenter is null)
+                return;
+
+            foreach (var item in _presenter.Items)
+                CollectClickableItems(item);
+        }
+
+        private void CollectClickableItems(MenuFlyoutItemBase item)
+        {
+            if (item is MenuFlyoutItem mfi)
+            {
+                // avoid double subscribing in case it happens
+                mfi.Click -= OnMenuItemClicked;
+                mfi.Click += OnMenuItemClicked;
+                _subscribedItems.Add(mfi);
+            }
+
+            if (item is MenuFlyoutSubItem mfsi)
+            {
+                foreach (var child in mfsi.Items)
+                    CollectClickableItems(child);
+            }
+            else if (item is SplitMenuFlyoutItem smfi)
+            {
+                foreach (var child in smfi.Items)
+                    CollectClickableItems(child);
+            }
+        }
+
+        private void UnsubscribeItemClicks()
+        {
+            foreach (var mfi in _subscribedItems)
+                mfi.Click -= OnMenuItemClicked;
+
+            _subscribedItems.Clear();
+        }
+
+        private void OnMenuItemClicked(object sender, RoutedEventArgs e)
+        {
+            Hide();
+        }
+
         /// <summary>
         /// Opens the menu flyout at the specified screen point.
         /// </summary>
@@ -112,6 +157,7 @@ namespace DesktopFlyouts
                 HideImmediate();
 
             EnsurePresenter();
+            SubscribeItemClicks();
 
             UpdateFlyoutTheme();
 
@@ -215,6 +261,8 @@ namespace DesktopFlyouts
 
         private void HideImmediate()
         {
+            UnsubscribeItemClicks();
+
             _ = _host?.UpdateWindowVisibility(false);
 
             // Remove the presenter from the visual tree.
@@ -282,6 +330,7 @@ namespace DesktopFlyouts
 
             if (_presenter is not null)
             {
+                UnsubscribeItemClicks();
                 _presenter.Items.Clear();
                 _presenter = null;
             }
