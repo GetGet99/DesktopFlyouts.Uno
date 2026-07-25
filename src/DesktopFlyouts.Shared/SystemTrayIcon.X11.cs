@@ -150,8 +150,28 @@ public class SystemTrayIcon : IDisposable
             throw new ObjectDisposedException(nameof(SystemTrayIcon));
 
         _isVisible = true;
+
+        // If the connection was disposed during a previous Destroy(), reconnect.
+        if (_connection is null)
+            _ = ReconnectAsync();
+
         if (_serviceConnected)
             _ = CreateTrayIconAsync();
+    }
+
+    async Task ReconnectAsync()
+    {
+        try
+        {
+            await InitializeAsync();
+            _sniHandler!.ActivationDelegate += OnActivation;
+            _sniHandler!.ContextMenuDelegate += OnContextMenu;
+            _sniHandler!.SecondaryActivateDelegate += OnSecondaryActivate;
+            _sniHandler!.ScrollDelegate += OnScroll;
+        }
+        catch
+        {
+        }
     }
 
     /// <summary>
@@ -308,7 +328,12 @@ public class SystemTrayIcon : IDisposable
             _serviceConnected = true;
             _statusNotifierWatcher = new StatusNotifierWatcher(_connection, "org.kde.StatusNotifierWatcher", "/StatusNotifierWatcher");
 
-            DestroyTrayIcon();
+            // Re-register the handler on the existing connection.
+            // No need to DestroyTrayIcon() here — the handler was already
+            // removed when the watcher went away, and DestroyTrayIcon()
+            // would dispose the connection we still need.
+            _connection.RemoveMethodHandler(_sniHandler!.Path);
+            _connection.AddMethodHandler(_sniHandler);
 
             if (_isVisible)
                 _ = CreateTrayIconAsync();
@@ -372,16 +397,26 @@ public class SystemTrayIcon : IDisposable
 
     void DestroyTrayIcon()
     {
-        if (_connection is null || !_serviceConnected || _isDisposed || _sniHandler is null || _sysTrayServiceName is null)
+        if (_sniHandler is null)
             return;
 
         try
         {
-            _connection.RemoveMethodHandler(_sniHandler.Path);
+            _connection?.RemoveMethodHandler(_sniHandler.Path);
         }
         catch
         {
         }
+
+        // Relinquish the bus name by disposing the connection and watch.
+        // A fresh connection will be created on the next Show() call.
+        _serviceWatchDisposable?.Dispose();
+        _serviceWatchDisposable = null;
+        _connection?.Dispose();
+        _connection = null;
+        _dBus = null;
+        _statusNotifierWatcher = null;
+        _serviceConnected = false;
     }
 
     // ─── Icon Management ──────────────────────────────────────────
