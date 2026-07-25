@@ -101,7 +101,8 @@ namespace DesktopFlyouts
                 return;
 
             foreach (var item in _presenter.Items)
-                CollectClickableItems(item);
+                if (item is MenuFlyoutItemBase mfib)
+                    CollectClickableItems(mfib);
         }
 
         private void CollectClickableItems(MenuFlyoutItemBase item)
