@@ -222,8 +222,8 @@ namespace DesktopFlyouts
             // Get the work area for positioning.
             var workArea = WindowHelpers.GetFlyoutWorkAreaRect(new Point(point.X, point.Y));
 
-            // Calculate position: center horizontally on point, place above the point (like a context menu).
-            var left = (double)point.X - (regionWidth / 2D);
+            // Calculate position: align to mouse X, place above the point (like a context menu).
+            var left = (double)point.X;
             var top = (double)point.Y - regionHeight;
 
             // Clamp to work area.
