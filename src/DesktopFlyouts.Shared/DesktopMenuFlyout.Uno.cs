@@ -79,7 +79,6 @@ namespace DesktopFlyouts
 
         private void EnsurePresenter()
         {
-            var isNew = _presenter is null;
             _presenter ??= new MenuFlyoutPresenter();
 
             _presenter.ItemsSource = new List<MenuFlyoutItemBase>(

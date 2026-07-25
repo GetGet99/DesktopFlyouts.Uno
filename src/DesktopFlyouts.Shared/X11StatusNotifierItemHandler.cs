@@ -70,16 +70,6 @@ class X11StatusNotifierItemHandler : DBusHandler, IStatusNotifierItemHandler, IS
         Connection.EmitNewStatus(new ObjectPath(Path), Status);
     }
 
-    public void SetAnimationFrame((int, int, byte[]) dbusPixmap, int frameIndex)
-    {
-        Id = $"{Id}-{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}-{frameIndex}";
-        IconPixmap = new[] { dbusPixmap };
-        IconName = "";
-        Status = "Active";
-        Connection.EmitNewTitle(new ObjectPath(Path));
-        Connection.EmitNewIcon(new ObjectPath(Path));
-    }
-
     public void SetAttentionIcon((int, int, byte[]) dbusPixmap)
     {
         AttentionIconPixmap = new[] { dbusPixmap };

@@ -37,6 +37,9 @@ public class SystemTrayIcon : IDisposable
     string _tooltip;
     string _iconPath;
 
+    public SystemTrayIcon(string iconPath, string tooltip, System.Guid id)
+        : this(iconPath, tooltip, id.ToString()) { }
+
     /// <summary>
     /// Initializes a new instance of <see cref="SystemTrayIcon"/> with an icon loaded from a
     /// file path.
@@ -150,28 +153,8 @@ public class SystemTrayIcon : IDisposable
             throw new ObjectDisposedException(nameof(SystemTrayIcon));
 
         _isVisible = true;
-
-        // If the connection was disposed during a previous Destroy(), reconnect.
-        if (_connection is null)
-            _ = ReconnectAsync();
-
         if (_serviceConnected)
             _ = CreateTrayIconAsync();
-    }
-
-    async Task ReconnectAsync()
-    {
-        try
-        {
-            await InitializeAsync();
-            _sniHandler!.ActivationDelegate += OnActivation;
-            _sniHandler!.ContextMenuDelegate += OnContextMenu;
-            _sniHandler!.SecondaryActivateDelegate += OnSecondaryActivate;
-            _sniHandler!.ScrollDelegate += OnScroll;
-        }
-        catch
-        {
-        }
     }
 
     /// <summary>
@@ -209,7 +192,14 @@ public class SystemTrayIcon : IDisposable
         DestroyTrayIcon();
 
         _serviceWatchDisposable?.Dispose();
+        _serviceWatchDisposable = null;
         _connection?.Dispose();
+        _connection = null;
+        _dBus = null;
+        _statusNotifierWatcher = null;
+        _serviceConnected = false;
+
+        GC.SuppressFinalize(this);
     }
 
     ~SystemTrayIcon() => Dispose();
@@ -405,16 +395,6 @@ public class SystemTrayIcon : IDisposable
         catch
         {
         }
-
-        // Relinquish the bus name by disposing the connection and watch.
-        // A fresh connection will be created on the next Show() call.
-        _serviceWatchDisposable?.Dispose();
-        _serviceWatchDisposable = null;
-        _connection?.Dispose();
-        _connection = null;
-        _dBus = null;
-        _statusNotifierWatcher = null;
-        _serviceConnected = false;
     }
 
     // ─── Icon Management ──────────────────────────────────────────

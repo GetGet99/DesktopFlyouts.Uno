@@ -26,7 +26,7 @@ public partial class App : Application
         TrayIconManager.Default.Initialize(new(
             iconPath,
             "DesktopFlyouts sample app (Uno)",
-            new("28DE460A-8BD6-4539-A406-5F685584FD4D")));
+            "28DE460A-8BD6-4539-A406-5F685584FD4D"));
 
         _window = new Window();
         _window.Content = new RootView();

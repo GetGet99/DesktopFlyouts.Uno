@@ -230,7 +230,8 @@ internal partial class RootViewModel : ObservableObject
 
     private void OnIconPathChanged(string? value)
     {
-        TrayIconManager.Default.SystemTrayIcon?.SetIcon(value ?? string.Empty);
+        if (!string.IsNullOrEmpty(value) && System.IO.File.Exists(value))
+            TrayIconManager.Default.SystemTrayIcon?.SetIcon(value);
     }
 
     private void OnTooltipTextChanged(string? value)
