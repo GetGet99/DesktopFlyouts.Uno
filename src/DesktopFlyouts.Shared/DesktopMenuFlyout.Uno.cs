@@ -61,6 +61,7 @@ namespace DesktopFlyouts
             _host.SetContent(this);
             _ = _host.UpdateWindowVisibility(false);
             _host.SystemSettingsChanged += HostWindow_SystemSettingsChanged;
+            _host.WindowInactivated += HostWindow_Inactivated;
         }
 
         /// <inheritdoc/>
@@ -230,6 +231,14 @@ namespace DesktopFlyouts
             UpdateFlyoutTheme();
         }
 
+        private void HostWindow_Inactivated(object? sender, EventArgs e)
+        {
+            if (_disposed || !IsOpen)
+                return;
+
+            Hide();
+        }
+
 #if UWP
         /// <summary>
         /// Lets the XAML island process a native keyboard message before dispatch.
@@ -278,6 +287,7 @@ namespace DesktopFlyouts
             }
 
             _host?.SystemSettingsChanged -= HostWindow_SystemSettingsChanged;
+            _host?.WindowInactivated -= HostWindow_Inactivated;
             _host?.Dispose();
             IsOpen = false;
 

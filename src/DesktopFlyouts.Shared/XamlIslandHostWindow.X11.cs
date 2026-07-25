@@ -26,6 +26,9 @@ internal partial class XamlIslandHostWindow : IDisposable
         _netWmWindowTypeDockAtom, _motifWmHintsAtom, _netActiveWindowAtom,
         _netWmOpacityAtom;
     private bool _disposed;
+    private bool _focused;
+    private bool _focusMonitoring;
+    private readonly DispatcherTimer _focusTimer;
     private DesktopFlyoutActivationMode _activationMode = DesktopFlyoutActivationMode.Activate;
 
     internal object? DesktopWindowXamlSource { get; private set; }
@@ -91,6 +94,9 @@ internal partial class XamlIslandHostWindow : IDisposable
         // Subscribe to window events.
         _window.Closed += OnWindowClosed;
         _window.Activated += OnWindowActivated;
+
+        _focusTimer = new DispatcherTimer { Interval = TimeSpan.FromMilliseconds(100) };
+        _focusTimer.Tick += FocusTimer_Tick;
 
         // Listen for property changes on the root window (theme changes, etc.).
         var rootWindow = XDefaultRootWindow(_display);
@@ -335,10 +341,17 @@ internal partial class XamlIslandHostWindow : IDisposable
             // Task.Delay avoids needing CompositionTarget.Rendering (which has thread issues).
             var opacityTask = RestoreOpacityAfterDelay();
             XFlush(_display);
+
+            // Start monitoring focus changes on our X11 window.
+            StartFocusMonitoring();
+
             return opacityTask;
         }
         else
         {
+            // Stop monitoring focus changes when hiding.
+            StopFocusMonitoring();
+
             foreach (var wnd in managedWindows)
             {
                 XUnmapWindow(_display, wnd);
@@ -438,6 +451,9 @@ internal partial class XamlIslandHostWindow : IDisposable
 
         _disposed = true;
 
+        StopFocusMonitoring();
+        _focusTimer.Stop();
+
         _window.Closed -= OnWindowClosed;
         _window.Activated -= OnWindowActivated;
 
@@ -463,6 +479,78 @@ internal partial class XamlIslandHostWindow : IDisposable
             override_redirect = enabled ? 1 : 0
         };
         XChangeWindowAttributes(_display, window, CWOverrideRedirect, ref attrs);
+    }
+
+    internal void StartFocusMonitoring()
+    {
+        if (_focusMonitoring || _disposed || _display is 0 || _x11Window is 0)
+            return;
+
+        _focusMonitoring = true;
+        _focused = true; // Assume focused when shown.
+        _focusTimer.Start();
+    }
+
+    internal void StopFocusMonitoring()
+    {
+        if (!_focusMonitoring)
+            return;
+
+        _focusMonitoring = false;
+        try { _focusTimer.Stop(); } catch { }
+    }
+
+    private void FocusTimer_Tick(object? sender, object e)
+    {
+        if (_disposed || _display is 0)
+        {
+            StopFocusMonitoring();
+            return;
+        }
+
+        try
+        {
+            var rootWindow = XDefaultRootWindow(_display);
+            if (rootWindow is 0)
+                return;
+
+            // Read _NET_ACTIVE_WINDOW from the root window (type WINDOW, 32-bit).
+            // AnyPropertyType (0) = return data regardless of the property's actual type.
+            var status = XGetWindowProperty(
+                _display,
+                (nuint)rootWindow,
+                (nuint)_netActiveWindowAtom,
+                0, 1, false,
+                0 /* AnyPropertyType */,
+                out var actualType, out _,
+                out var nItems, out _,
+                out var prop);
+
+            if (status != 0 || actualType is not 33 /* XA_WINDOW */ || nItems < 1 || prop is 0)
+                return;
+
+            try
+            {
+                var activeWindow = Marshal.ReadIntPtr(prop);
+                var wasFocused = _focused;
+                _focused = activeWindow == _x11Window;
+
+                if (wasFocused && !_focused)
+                    WindowInactivated?.Invoke(this, EventArgs.Empty);
+            }
+            finally
+            {
+                XFree(prop);
+            }
+        }
+        catch (ObjectDisposedException)
+        {
+            StopFocusMonitoring();
+        }
+        catch
+        {
+            StopFocusMonitoring();
+        }
     }
 
     private void OnWindowClosed(object? sender, WindowEventArgs args)
