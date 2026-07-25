@@ -1,6 +1,7 @@
 #if !WINDOWS
 using System;
 using System.Drawing;
+using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.WinUI;
 using FoundationSize = Windows.Foundation.Size;
@@ -89,10 +90,8 @@ namespace DesktopFlyouts
             var isNew = _presenter is null;
             _presenter ??= new MenuFlyoutPresenter();
 
-            _presenter.Items.Clear();
-
-            foreach (var item in Items)
-                _presenter.Items.Add((MenuFlyoutItemBase)item);
+            _presenter.ItemsSource = new List<MenuFlyoutItemBase>(
+                Items.Cast<MenuFlyoutItemBase>());
         }
 
         private void SubscribeItemClicks()
@@ -333,7 +332,7 @@ namespace DesktopFlyouts
             if (_presenter is not null)
             {
                 UnsubscribeItemClicks();
-                _presenter.Items.Clear();
+                _presenter.ItemsSource = null;
                 _presenter = null;
             }
 
