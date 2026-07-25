@@ -1,6 +1,5 @@
 #if !WINDOWS
 using System;
-using System.Diagnostics;
 using System.Drawing;
 using System.Threading.Tasks;
 using CommunityToolkit.WinUI;
@@ -33,7 +32,6 @@ namespace DesktopFlyouts
     public partial class DesktopMenuFlyout : ItemsControl, IDisposable
     {
         private const string PART_MenuFlyoutTargetControl = "PART_MenuFlyoutTargetControl";
-        private const string LogTag = "[DesktopMenuFlyout]";
 
         private readonly XamlIslandHostWindow? _host;
         private MenuFlyoutPresenter? _presenter;
@@ -57,15 +55,12 @@ namespace DesktopFlyouts
         /// </remarks>
         public DesktopMenuFlyout()
         {
-            Debug.WriteLine($"{LogTag} Constructor: creating XamlIslandHostWindow");
             DefaultStyleKey = typeof(DesktopMenuFlyout);
 
             _host = new XamlIslandHostWindow();
             _host.SetContent(this);
             _ = _host.UpdateWindowVisibility(false);
             _host.SystemSettingsChanged += HostWindow_SystemSettingsChanged;
-
-            Debug.WriteLine($"{LogTag} Constructor: host created, content set, window hidden");
         }
 
         /// <inheritdoc/>
@@ -74,15 +69,12 @@ namespace DesktopFlyouts
             base.OnApplyTemplate();
 
             MenuFlyoutTargetControl = GetTemplateChild(PART_MenuFlyoutTargetControl) as Panel;
-            Debug.WriteLine($"{LogTag} OnApplyTemplate: MenuFlyoutTargetControl={(MenuFlyoutTargetControl?.GetType().Name ?? "NULL")}");
         }
 
         /// <inheritdoc/>
         protected override void OnItemsChanged(object e)
         {
             base.OnItemsChanged(e);
-
-            Debug.WriteLine($"{LogTag} OnItemsChanged: Items.Count={Items.Count}, disposed={_disposed}");
 
             if (_disposed)
                 return;
@@ -99,8 +91,6 @@ namespace DesktopFlyouts
 
             foreach (var item in Items)
                 _presenter.Items.Add((MenuFlyoutItemBase)item);
-
-            Debug.WriteLine($"{LogTag} EnsurePresenter: created={isNew}, presenter.Items.Count={_presenter.Items.Count}");
         }
 
         /// <summary>
@@ -113,21 +103,14 @@ namespace DesktopFlyouts
         /// </remarks>
         public void Show(Point point)
         {
-            Debug.WriteLine($"{LogTag} Show({point.X}, {point.Y}): disposed={_disposed}, IsOpen={IsOpen}, _isShowPending={_isShowPending}");
-
             if (_disposed)
                 return;
 
             // If a previous show is still pending its deferred layout, hide first.
             if (_isShowPending || IsOpen)
-            {
-                Debug.WriteLine($"{LogTag} Show: previous show pending or already open, hiding first");
                 HideImmediate();
-            }
 
             EnsurePresenter();
-
-            Debug.WriteLine($"{LogTag} Show: MenuFlyoutTargetControl={(MenuFlyoutTargetControl?.GetType().Name ?? "NULL")}, host={(_host is not null ? "OK" : "NULL")}");
 
             UpdateFlyoutTheme();
 
@@ -137,7 +120,6 @@ namespace DesktopFlyouts
 
             // Get the work area for positioning.
             var workArea = WindowHelpers.GetFlyoutWorkAreaRect(new Point(point.X, point.Y));
-            Debug.WriteLine($"{LogTag} Show: workArea=({workArea.X}, {workArea.Y}, {workArea.Width}, {workArea.Height})");
 
             // Step 1: Place the host window at the target position with a generous initial size
             // so that XAML can compute layout for the MenuFlyoutPresenter.
@@ -149,16 +131,12 @@ namespace DesktopFlyouts
                 Height = workArea.Height / 2
             };
 
-            Debug.WriteLine($"{LogTag} Show (pass 1): initial region=({initRegion.X}, {initRegion.Y}, {initRegion.Width}, {initRegion.Height})");
-
             _host?.MoveAndResize(initRegion);
             _host?.SetHWndRectRegion(new RectInt32() { Width = initRegion.Width, Height = initRegion.Height });
             _ = _host?.UpdateWindowVisibility(true);
 
             IsOpen = true;
             _isShowPending = true;
-
-            Debug.WriteLine($"{LogTag} Show: host mapped, waiting for layout pass...");
 
             // Step 2: After the window is mapped and XAML has had a layout pass,
             // measure the presenter and resize to the correct size.
@@ -177,12 +155,9 @@ namespace DesktopFlyouts
         {
             if (_disposed || !_isShowPending || _presenter is null || MenuFlyoutTargetControl is null)
             {
-                Debug.WriteLine($"{LogTag} FinalizeShow: aborted (disposed={_disposed}, pending={_isShowPending})");
                 _isShowPending = false;
                 return;
             }
-
-            Debug.WriteLine($"{LogTag} FinalizeShow: measuring presenter...");
 
             // Force a layout pass so the presenter calculates its desired size.
             _presenter.Measure(new FoundationSize(double.PositiveInfinity, double.PositiveInfinity));
@@ -192,13 +167,9 @@ namespace DesktopFlyouts
             var presenterWidth = _presenter.ActualWidth > 0 ? _presenter.ActualWidth : _presenter.DesiredSize.Width;
             var presenterHeight = _presenter.ActualHeight > 0 ? _presenter.ActualHeight : _presenter.DesiredSize.Height;
 
-            Debug.WriteLine($"{LogTag} FinalizeShow: DesiredSize=({_presenter.DesiredSize.Width}, {_presenter.DesiredSize.Height}), ActualSize=({_presenter.ActualWidth}, {_presenter.ActualHeight}), resolved=({presenterWidth}, {presenterHeight})");
-
             // Ensure minimum size.
             var regionWidth = Math.Max(1, (int)Math.Ceiling(presenterWidth));
             var regionHeight = Math.Max(1, (int)Math.Ceiling(presenterHeight));
-
-            Debug.WriteLine($"{LogTag} FinalizeShow: regionSize=({regionWidth}, {regionHeight})");
 
             // Get the work area for positioning.
             var workArea = WindowHelpers.GetFlyoutWorkAreaRect(new Point(point.X, point.Y));
@@ -206,8 +177,6 @@ namespace DesktopFlyouts
             // Calculate position: center horizontally on point, place above the point (like a context menu).
             var left = (double)point.X - (regionWidth / 2D);
             var top = (double)point.Y - regionHeight;
-
-            Debug.WriteLine($"{LogTag} FinalizeShow: raw position=({left}, {top})");
 
             // Clamp to work area.
             left = Clamp(left, workArea.Left, workArea.Right - regionWidth);
@@ -221,14 +190,11 @@ namespace DesktopFlyouts
                 Height = regionHeight
             };
 
-            Debug.WriteLine($"{LogTag} FinalizeShow: final region=({region.X}, {region.Y}, {region.Width}, {region.Height})");
-
             // Resize and reposition the host window to the correct size.
             _host?.MoveAndResize(region);
             _host?.SetHWndRectRegion(new RectInt32() { Width = regionWidth, Height = regionHeight });
 
             _isShowPending = false;
-            Debug.WriteLine($"{LogTag} FinalizeShow: complete");
         }
 
         /// <summary>
@@ -239,8 +205,6 @@ namespace DesktopFlyouts
         /// </remarks>
         public void Hide()
         {
-            Debug.WriteLine($"{LogTag} Hide(): disposed={_disposed}, IsOpen={IsOpen}, _isShowPending={_isShowPending}");
-
             if (_disposed)
                 return;
 
@@ -250,21 +214,16 @@ namespace DesktopFlyouts
 
         private void HideImmediate()
         {
-            Debug.WriteLine($"{LogTag} HideImmediate()");
-
             _ = _host?.UpdateWindowVisibility(false);
 
             // Remove the presenter from the visual tree.
             MenuFlyoutTargetControl?.Children.Clear();
 
             IsOpen = false;
-            Debug.WriteLine($"{LogTag} HideImmediate(): complete, IsOpen=false");
         }
 
         private void HostWindow_SystemSettingsChanged(object? sender, EventArgs e)
         {
-            Debug.WriteLine($"{LogTag} HostWindow_SystemSettingsChanged: disposed={_disposed}");
-
             if (_disposed)
                 return;
 
@@ -290,7 +249,6 @@ namespace DesktopFlyouts
         private void UpdateFlyoutTheme()
         {
             var isLight = GeneralHelpers.IsTaskbarLight();
-            Debug.WriteLine($"{LogTag} UpdateFlyoutTheme: isTaskbarLight={isLight}");
             RequestedTheme = isLight ? ElementTheme.Light : ElementTheme.Dark;
         }
 
@@ -304,8 +262,6 @@ namespace DesktopFlyouts
         /// <inheritdoc/>
         public void Dispose()
         {
-            Debug.WriteLine($"{LogTag} Dispose(): disposed={_disposed}");
-
             if (_disposed)
                 return;
 
@@ -324,8 +280,6 @@ namespace DesktopFlyouts
             _host?.SystemSettingsChanged -= HostWindow_SystemSettingsChanged;
             _host?.Dispose();
             IsOpen = false;
-
-            Debug.WriteLine($"{LogTag} Dispose(): complete");
 
             GC.SuppressFinalize(this);
         }

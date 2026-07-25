@@ -32,7 +32,6 @@ public partial class App : Application
         _window.Content = new RootView();
         _window.Closed += (_, _) => TrayIconManager.Default.Dispose();
         _window.Activate();
-        Debug.WriteLine("[App] Main window activated.");
     }
 
     private void AppDomain_ProcessExit(object? sender, EventArgs e)
