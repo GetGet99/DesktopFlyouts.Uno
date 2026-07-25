@@ -6,17 +6,9 @@ using System.Threading.Tasks;
 using CommunityToolkit.WinUI;
 using FoundationSize = Windows.Foundation.Size;
 using Windows.Graphics;
-
-#if UWP
-using Windows.UI.Xaml;
-using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Markup;
-using Windows.Win32.UI.WindowsAndMessaging;
-#elif WASDK
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Markup;
-#endif
 
 namespace DesktopFlyouts
 {

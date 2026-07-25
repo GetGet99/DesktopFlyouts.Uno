@@ -54,12 +54,16 @@ public class SystemTrayIcon : IDisposable
         _id = id;
         _iconPath = iconPath;
         _tooltip = tooltip;
+
+        // Render the initial icon synchronously so that any SetIcon() call
+        // during async initialization is not overwritten by the captured path.
+        _currentIcon = RenderIcon(iconPath);
+
         _ = InitAsync();
 
         async Task InitAsync()
         {
             await InitializeAsync();
-            UpdateIcon(iconPath);
             _sniHandler!.ActivationDelegate += OnActivation;
             _sniHandler!.ContextMenuDelegate += OnContextMenu;
             _sniHandler!.SecondaryActivateDelegate += OnSecondaryActivate;
@@ -299,7 +303,7 @@ public class SystemTrayIcon : IDisposable
         if (_isDisposed || _connection is null || name != "org.kde.StatusNotifierWatcher")
             return;
 
-        if (!_serviceConnected && newOwner is not null)
+        if (!_serviceConnected && !string.IsNullOrEmpty(newOwner))
         {
             _serviceConnected = true;
             _statusNotifierWatcher = new StatusNotifierWatcher(_connection, "org.kde.StatusNotifierWatcher", "/StatusNotifierWatcher");
@@ -309,7 +313,7 @@ public class SystemTrayIcon : IDisposable
             if (_isVisible)
                 _ = CreateTrayIconAsync();
         }
-        else if (_serviceConnected && newOwner is null)
+        else if (_serviceConnected && string.IsNullOrEmpty(newOwner))
         {
             DestroyTrayIcon();
             _serviceConnected = false;

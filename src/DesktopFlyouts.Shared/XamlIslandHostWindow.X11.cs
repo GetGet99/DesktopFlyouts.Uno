@@ -506,8 +506,43 @@ internal partial class XamlIslandHostWindow : IDisposable
             return;
 
         _focusMonitoring = true;
-        _focused = true; // Assume focused when shown.
+
+        // Read the actual active window from X11 instead of assuming focused.
+        // For NoActivateOnOpen / NeverActivate flyouts the host never becomes
+        // the active window, so assuming true would cause a spurious
+        // WindowInactivated on the first timer tick.
+        _focused = IsOurWindowActive();
         _focusTimer.Start();
+    }
+
+    private bool IsOurWindowActive()
+    {
+        var rootWindow = XDefaultRootWindow(_display);
+        if (rootWindow is 0)
+            return false;
+
+        var status = XGetWindowProperty(
+            _display,
+            (nuint)rootWindow,
+            (nuint)_netActiveWindowAtom,
+            0, 1, false,
+            0 /* AnyPropertyType */,
+            out var actualType, out _,
+            out var nItems, out _,
+            out var prop);
+
+        if (status != 0 || actualType is not 33 /* XA_WINDOW */ || nItems < 1 || prop is 0)
+            return false;
+
+        try
+        {
+            var activeWindow = Marshal.ReadIntPtr(prop);
+            return activeWindow == _x11Window;
+        }
+        finally
+        {
+            XFree(prop);
+        }
     }
 
     internal void StopFocusMonitoring()
