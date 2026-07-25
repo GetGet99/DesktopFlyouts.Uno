@@ -223,8 +223,9 @@ namespace DesktopFlyouts
             var workArea = WindowHelpers.GetFlyoutWorkAreaRect(new Point(point.X, point.Y));
 
             // Calculate position: align to mouse X, place above the point (like a context menu).
+            // 32 magic number is the offset between window bottom and the actual rendering - probably shadow
             var left = (double)point.X;
-            var top = (double)point.Y - regionHeight;
+            var top = (double)point.Y - regionHeight + 32;
 
             // Clamp to work area.
             left = Clamp(left, workArea.Left, workArea.Right - regionWidth);
