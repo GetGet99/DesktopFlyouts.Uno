@@ -51,7 +51,24 @@ internal partial class XamlIslandHostWindow : IDisposable
         get => 1.0D;
     }
 
-    internal event EventHandler? WindowInactivated;
+    private EventHandler? _windowInactivated;
+    private bool _windowVisible;
+
+    internal event EventHandler? WindowInactivated
+    {
+        add
+        {
+            _windowInactivated += value;
+            if (_windowVisible)
+                StartFocusMonitoring();
+        }
+        remove
+        {
+            _windowInactivated -= value;
+            if (_windowInactivated is null)
+                StopFocusMonitoring();
+        }
+    }
     internal event EventHandler? SystemSettingsChanged;
 
     private readonly List<nint> managedWindows;
@@ -295,6 +312,8 @@ internal partial class XamlIslandHostWindow : IDisposable
             return default;
         }
 
+        _windowVisible = isVisible;
+
         if (isVisible)
         {
             // Set _NET_WM_WINDOW_OPACITY = 0 BEFORE mapping so the compositor
@@ -483,7 +502,7 @@ internal partial class XamlIslandHostWindow : IDisposable
 
     internal void StartFocusMonitoring()
     {
-        if (_focusMonitoring || _disposed || _display is 0 || _x11Window is 0)
+        if (_focusMonitoring || _disposed || _display is 0 || _x11Window is 0 || _windowInactivated is null)
             return;
 
         _focusMonitoring = true;
@@ -536,7 +555,7 @@ internal partial class XamlIslandHostWindow : IDisposable
                 _focused = activeWindow == _x11Window;
 
                 if (wasFocused && !_focused)
-                    WindowInactivated?.Invoke(this, EventArgs.Empty);
+                    _windowInactivated?.Invoke(this, EventArgs.Empty);
             }
             finally
             {
@@ -555,14 +574,14 @@ internal partial class XamlIslandHostWindow : IDisposable
 
     private void OnWindowClosed(object? sender, WindowEventArgs args)
     {
-        WindowInactivated?.Invoke(this, EventArgs.Empty);
+        _windowInactivated?.Invoke(this, EventArgs.Empty);
     }
 
     private void OnWindowActivated(object? sender, WindowActivatedEventArgs args)
     {
         if (args.WindowActivationState is Windows.UI.Core.CoreWindowActivationState.Deactivated)
         {
-            WindowInactivated?.Invoke(this, EventArgs.Empty);
+            _windowInactivated?.Invoke(this, EventArgs.Empty);
         }
     }
 }
