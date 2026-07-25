@@ -27,7 +27,7 @@ public class SystemTrayIcon : IDisposable
     string? _sysTrayServiceName;
     bool _isDisposed;
     bool _serviceConnected;
-    bool _isVisible = true;
+    bool _isVisible;
 
     (int, int, byte[]) _currentIcon = (1, 1, new byte[] { 255, 0, 0, 0 });
 
@@ -288,8 +288,6 @@ public class SystemTrayIcon : IDisposable
         _dBus = new(_connection, "org.freedesktop.DBus", "/org/freedesktop/DBus");
 
         _sniHandler = new X11StatusNotifierItemHandler(_connection, _id, _id);
-
-        _isVisible = true;
 
         await WatchAsync(cancellationToken);
     }
