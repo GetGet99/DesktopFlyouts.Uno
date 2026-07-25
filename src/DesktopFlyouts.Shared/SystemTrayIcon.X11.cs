@@ -1,4 +1,4 @@
-#if DESKTOP
+#if HAS_UNO
 using Tmds.DBus.Protocol;
 using DesktopFlyouts.DBus;
 using SkiaSharp;

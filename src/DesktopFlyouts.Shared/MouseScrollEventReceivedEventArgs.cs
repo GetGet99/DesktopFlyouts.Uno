@@ -1,4 +1,4 @@
-#if DESKTOP
+#if HAS_UNO
 namespace DesktopFlyouts;
 
 public enum MouseScrollOrientation

@@ -280,7 +280,7 @@ namespace DesktopFlyouts
             _host?.SetActivationMode((DesktopFlyoutActivationMode)e.NewValue);
             UpdateFocusSuppression();
         }
-#if DESKTOP
+#if HAS_UNO
         partial void OnHideOnLostFocusPropertyChanged(DependencyPropertyChangedEventArgs e)
         {
             if (_host is null || _disposed)
